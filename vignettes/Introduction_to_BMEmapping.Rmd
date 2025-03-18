@@ -58,10 +58,6 @@ and the documentation of the `utah` data can be found by invoking the command:
 ```
 
 
-The geographical locations of the measurement locations and the type of measurement they collect are displayed below
-
-
-
 $~$
   
 ## Prediction Exploration
