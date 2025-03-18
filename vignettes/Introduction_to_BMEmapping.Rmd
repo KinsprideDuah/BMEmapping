@@ -21,14 +21,11 @@ Environmental data are often imprecise due to various limitations and uncertaint
 The `bme` package is used make spatial interpolations for unobserved locations using hard and soft-interval data. This vignette provides an overview of basic features in `bme`. We load `bme` by running
 
 ```{r}
-library(BMEmap)
+library(BMEmapping)
 ```
 
 If you use `bme` in a formal publication or report, please cite it. Citing `bme`lets us devote more resources to it in the future. We view the `bme` citation by running
 
-```{r eval=FALSE}
-citation(package = "BMEmap")
-```
 
 
 ## Data
