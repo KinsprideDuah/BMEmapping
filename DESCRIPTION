@@ -1,13 +1,18 @@
 Package: BMEmapping
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Spatial Interpolation using Bayesian Maximum Entropy (BME)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R: 
+    c(person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
+    role = c("aut", "cre"), comment = c(ORCID = "0009-0004-3990-7985")),
+    person("Yan", "Sun", email = "yan.sun@usu.edu", role = "aut"))
+Maintainer: Kinspride Duah <kinspride2020@gmail.com>
+Description: 
+    Package for spatial interpolation with hard and soft-interval data using 
+    Bayesian Maximum Entropy (BME) method.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/KinsprideDuah/BMEmapping
 BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
+RoxygenNote: 7.3.2
