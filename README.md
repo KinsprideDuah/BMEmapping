@@ -25,8 +25,8 @@ devtools::install_github("KinsprideDuah/BMEmapping")
 
 ## Functions
 
-`bme_predict` - predicts the posterior mean or mode with its
-accompanying variance estimate of an unobserved location.
+`bme_predict` - predicts the posterior mean/mode and variance of an
+unobserved location.
 
 `bme_cv` - performs a cross-validation to check model performance.
 

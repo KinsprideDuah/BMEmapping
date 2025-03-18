@@ -31,7 +31,7 @@ $~$
 
 ## Main Functions
 
-The main functions available in BMEmapping include:
+The main functions available in `BMEmapping` include:
 
 `bme_predict` - predicts the posterior mean/mode and variance of an unobserved location.
 
