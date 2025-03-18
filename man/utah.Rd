@@ -7,16 +7,18 @@
 \format{
 A data frame with 232 rows and 5 variables:
 
- \describe{
- \item{lat}{Latitude coordinate position}
- \item{lon}{Longitude coordinate position}
- \item{center}{The hard data value}
- \item{lower}{The lower endpoint of the soft-interval}
- \item{upper}{The upper endpoint of the soft-interval}
- }
+\describe{
+\item{lat}{Latitude coordinate position}
+\item{lon}{Longitude coordinate position}
+\item{center}{The hard data value}
+\item{lower}{The lower endpoint of the soft-interval}
+\item{upper}{The upper endpoint of the soft-interval}
+}
 }
 \source{
-* [The 2020 National Snow Load Study](https://doi.org/10.26077/200k-pr86)
+\itemize{
+\item \href{https://doi.org/10.26077/200k-pr86}{The 2020 National Snow Load Study}
+}
 }
 \usage{
 utah

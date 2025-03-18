@@ -1,10 +1,9 @@
 Package: BMEmapping
 Type: Package
 Title: Spatial Interpolation using Bayesian Maximum Entropy (BME)
-Version: 0.1.0
-Authors@R: 
-    c(person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
-    role = c("aut", "cre")),
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Kinspride", "Duah", email = "kinspride2020@gmail.com", role = c("aut", "cre")),
     person("Yan", "Sun", email = "yan.sun@usu.edu", role = "aut"))
 Maintainer: Kinspride Duah <kinspride2020@gmail.com>
 Description: 
@@ -15,11 +14,16 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/KinsprideDuah/BMEmapping
 BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
+    ggplot2,
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
     mvtnorm
 Depends: 
     R (>= 3.5)
+VignetteBuilder: knitr

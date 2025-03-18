@@ -8,21 +8,23 @@
 A data frame with 346 rows and 8 columns.
 
 \describe{
-  \item{STATION}{Name of the snow measuring station}
-  \item{LATITUDE}{Latitude coordinate position}
-  \item{LONGITUDE}{Longitude coordinate position}
-  \item{ELEVATION}{Elevation of the measring station (measured in meters)}
-  \item{RTSL}{The hard data RTSL value}
-  \item{LOWER}{The lower endpoint RTSL}
-  \item{UPPER}{The upper endpoint RTSL}
-  \item{TYPE}{Type of snow measurement, WESD is direct and SNWD is indirect
-              measurement. Direct measurements are hard data and have the
-              lower, upper and center values are the same. Indirect
-              measurements have LOWER < RTSL < UPPER.}
+\item{STATION}{Name of the snow measuring station}
+\item{LATITUDE}{Latitude coordinate position}
+\item{LONGITUDE}{Longitude coordinate position}
+\item{ELEVATION}{Elevation of the measring station (measured in meters)}
+\item{RTSL}{The hard data RTSL value}
+\item{LOWER}{The lower endpoint RTSL}
+\item{UPPER}{The upper endpoint RTSL}
+\item{TYPE}{Type of snow measurement, WESD is direct and SNWD is indirect
+measurement. Direct measurements are hard data and have the
+lower, upper and center values are the same. Indirect
+measurements have LOWER < RTSL < UPPER.}
 }
 }
 \source{
-* [The 2020 National Snow Load Study](https://doi.org/10.26077/200k-pr86)
+\itemize{
+\item \href{https://doi.org/10.26077/200k-pr86}{The 2020 National Snow Load Study}
+}
 }
 \usage{
 california

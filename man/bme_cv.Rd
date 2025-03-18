@@ -35,14 +35,14 @@ mode)}
 }
 \value{
 Data frame of estimation locations with their corresponding
-         predictions, residuals and folds.
+predictions, residuals and folds.
 }
 \description{
 bme_cv function
 }
 \details{
 Leave-one-out cross validation (LOOCV) function to compute
-         predictions for ONLY hard data locations.
+predictions for ONLY hard data locations.
 }
 \examples{
 data("utah")

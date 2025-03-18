@@ -1,1 +1,3 @@
-exportPattern("^[[:alpha:]]+")
+export(bme_cv)
+export(bme_predict)
+export(posterior_plot)

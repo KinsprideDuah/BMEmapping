@@ -51,7 +51,7 @@ mode)}
 }
 \value{
 Data frame of estimation locations with their corresponding BME
-         predictions
+predictions
 }
 \description{
 bme_predict function
