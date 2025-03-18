@@ -13,43 +13,56 @@ knitr::opts_chunk$set(
 )
 ```
 
-# BMEmapping
+**NOTE: This is a toy package created for expository purposes, for the second edition of [R Packages](https://r-pkgs.org). It is not meant to actually be useful. If you want a package for factor handling, please see [stringr](https://stringr.tidyverse.org), [stringi](https://stringi.gagolewski.com/),
+[rex](https://cran.r-project.org/package=rex), and
+[rematch2](https://cran.r-project.org/package=rematch2).**
+
+# regexcite
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of BMEmapping is to ...
+The goal of regexcite is to make regular expressions more exciting!
+It provides convenience functions to make some common tasks with string manipulation and regular expressions a bit easier.
 
 ## Installation
 
-You can install the development version of BMEmapping from [GitHub](https://github.com/) with:
-
+You can install the development version of regexcite from [GitHub](https://github.com/) with:
+      
 ``` r
-# install.packages("pak")
-pak::pak("KinsprideDuah/BMEmapping")
+# install.packages("devtools")
+devtools::install_github("KinsprideDuah/BMEmapping")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+A fairly common task when dealing with strings is the need to split a single string into many parts.
+This is what `base::strplit()` and `stringr::str_split()` do.
 
-```{r example}
-library(BMEmapping)
-## basic example code
+```{r}
+(x <- "alfa,bravo,charlie,delta")
+strsplit(x, split = ",")
+stringr::str_split(x, pattern = ",")
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Notice how the return value is a **list** of length one, where the first element holds the character vector of parts.
+Often the shape of this output is inconvenient, i.e. we want the un-listed version.
 
-```{r cars}
-summary(cars)
+That's exactly what `regexcite::str_split_one()` does.
+
+```{r eval=FALSE}
+library(regexcite)
+
+str_split_one(x, pattern = ",")
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+Use `str_split_one()` when the input is known to be a single string.
+For safety, it will error if its input has length greater than one.
 
-You can also embed plots, for example:
+`str_split_one()` is built on `stringr::str_split()`, so you can use its `n` argument and stringr's general interface for describing the `pattern` to be matched.
 
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
+```{r eval=FALSE}
+str_split_one(x, pattern = ",", n = 2)
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+y <- "192.168.0.1"
+str_split_one(y, pattern = stringr::fixed("."))
