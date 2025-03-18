@@ -13,56 +13,43 @@ knitr::opts_chunk$set(
 )
 ```
 
-**NOTE: This is a toy package created for expository purposes, for the second edition of [R Packages](https://r-pkgs.org). It is not meant to actually be useful. If you want a package for factor handling, please see [stringr](https://stringr.tidyverse.org), [stringi](https://stringi.gagolewski.com/),
-[rex](https://cran.r-project.org/package=rex), and
-[rematch2](https://cran.r-project.org/package=rematch2).**
-
-# regexcite
+## BMEmapping
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of regexcite is to make regular expressions more exciting!
-It provides convenience functions to make some common tasks with string manipulation and regular expressions a bit easier.
+### Spatial Interpolation for data comprising hard and soft-interval forms
+
+Bayesian maximum entropy (BME) is a generalized spatial interpolation
+method that processes both hard and soft data simultaneously to
+effectively account for both spatial uncertainty and measurement
+imprecision.
 
 ## Installation
 
-You can install the development version of regexcite from [GitHub](https://github.com/) with:
+You can install the development version of BMEmapping from [GitHub](https://github.com/) with:
       
 ``` r
 # install.packages("devtools")
 devtools::install_github("KinsprideDuah/BMEmapping")
 ```
 
-## Usage
+## Functions
 
-A fairly common task when dealing with strings is the need to split a single string into many parts.
-This is what `base::strplit()` and `stringr::str_split()` do.
+*bme_predict* - predicts the posterior mean or mode with its accompanying variance estimate of an unobserved location.
 
-```{r}
-(x <- "alfa,bravo,charlie,delta")
-strsplit(x, split = ",")
-stringr::str_split(x, pattern = ",")
-```
+*bme_cv* - performs a cross-validation to check model performance.
 
-Notice how the return value is a **list** of length one, where the first element holds the character vector of parts.
-Often the shape of this output is inconvenient, i.e. we want the un-listed version.
+*posterior_plot* - plots the the posterior density of an unobserved location.
 
-That's exactly what `regexcite::str_split_one()` does.
+## Getting help
 
-```{r eval=FALSE}
-library(regexcite)
+If you encounter a clear bug, please file an issue with a minimal reproducible example on [GitHub](https://github.com/KinsprideDuah/BMEmapping/issues).
 
-str_split_one(x, pattern = ",")
-```
+## Author
 
-Use `str_split_one()` when the input is known to be a single string.
-For safety, it will error if its input has length greater than one.
+Kinspride Duah
 
-`str_split_one()` is built on `stringr::str_split()`, so you can use its `n` argument and stringr's general interface for describing the `pattern` to be matched.
+## License
 
-```{r eval=FALSE}
-str_split_one(x, pattern = ",", n = 2)
-
-y <- "192.168.0.1"
-str_split_one(y, pattern = stringr::fixed("."))
+MIT + file LICENSE

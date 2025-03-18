@@ -2,7 +2,7 @@
 title: "Introduction to BMEmapping"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction_to_BMEmapping}
+  %\VignetteIndexEntry{Introduction to BMEmapping}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,23 +18,39 @@ knitr::opts_chunk$set(
 
 Environmental data are often imprecise due to various limitations and uncertainties in the measuring process. As a result, they often consist of a combination of both precise and imprecise information, referred to as hard and soft data, respectively. Often in practice, soft data are characterized as intervals as a simple form to properly preserve the underlying imprecision. For instance, weather stations that record historical climate conditions do not provide exact measurements. The available measurements, in the mean time, are usually subject to various uncertainties and limitations. As a result, environmental and climate data are typically imprecise. Often in practice, soft data are characterized as intervals as a simple form to properly preserve the underlying imprecision. 
 
-The `bme` package is used make spatial interpolations for unobserved locations using hard and soft-interval data. This vignette provides an overview of basic features in `bme`. We load `bme` by running
+The `BMEmapping` package is used make spatial interpolations for unobserved locations using hard and soft-interval data. This vignette provides an overview of basic features in `BMEmapping`. We load `BMEmapping` by running
 
-```{r}
+```{r setup, message=FALSE, warning=FALSE}
+library(ggplot2)  # For plots
+
 library(BMEmapping)
 ```
 
-If you use `bme` in a formal publication or report, please cite it. Citing `bme`lets us devote more resources to it in the future. We view the `bme` citation by running
+
+$~$
+
+## Main Functions
+
+The main functions available in BMEmapping include:
+
+`bme_predict` - predicts the posterior mean/mode and variance of an unobserved location.
+
+`bme_cv` - performs a cross-validation to check model performance.
+
+`posterior_plot` - plots the the posterior density of an unobserved location.
 
 
+$~$
 
-## Data
+## A Data Example
 
-To introduce the functionality of `BMEmap`, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utah` data that is part of the package and can be accessed by the command
+To introduce the functionality of `BMEmapping`, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utah` data that is part of the package and can be accessed by the command
 
 ```{r}
 data("utah")
+head(utah)
 ```
+
 and the documentation of the `utah` data can be found by invoking the command:
 
 ```{r eval=FALSE}
@@ -44,18 +60,13 @@ and the documentation of the `utah` data can be found by invoking the command:
 
 The geographical locations of the measurement locations and the type of measurement they collect are displayed below
 
+
+
 $~$
   
 ## Prediction Exploration
   
-Bayesian Maximum Entropy (BME) is a spatiotemporal interpolation technique that combines various forms of physical knowledge ($\mathcal{K}$): general knowledge ($\mathcal{G}$, which includes assumptions, constraints, physical laws, etc.) and specification knowledge ($\mathcal{S}$, which includes, but is not limited to, site-specific data) to estimate a spatiotemporal random field. Our goal of using BME analysis is to integrate both hard data $\boldsymbol{z}_h$ and soft-interval data $\boldsymbol{z}_s$ to interpolate the value $z_k$ at any unmeasured location $\boldsymbol{x}_k$. The mathematical analysis involved in the three stages of the BME approach leads to the posterior pdf at location $\boldsymbol{x}_k$ expressed as
-\begin{equation}\label{E7}
-f_{\mathcal{K}}(z_k) = A^{-1} \int^{\boldsymbol{b}}_{\boldsymbol{a}} f_\mathcal{G} (\boldsymbol{z}_s | \boldsymbol{z}_h, z_k) d\boldsymbol{z}_s  f_\mathcal{G} (\boldsymbol{z}_h, z_k),
-\end{equation}
-$\boldsymbol{a}$ and $\boldsymbol{a}$ represents the lower and upper bonds of the interval data.
-This posterior pdf, which may not be Gaussian provides a full picture of the prediction situation at the target point. Interested readers are referred to Christakos (1990) for a more detailed description of the BME framework.
-
-We can plot the posterior density of an unknown location $\boldsymbol{x}_k$ given data using the `posterior_plot` function. The `posterior_plot` function requires the following arguments:
+The `posterior_plot` functions require the following arguments:
   
 * `x`: is the prediction geographic location
 * `ch`: is the geographic location of hard data
@@ -72,7 +83,9 @@ The following arguments are optional:
   
 * `nsmax`: is the number soft-interval data allowable in the integration process, If not specified, the default value is 10. Thus, the 10 closest soft data locations to the prediction location are to be used in the integration process. Generally, results for `nsmax` = 10 is very close to that of `nsmax` > 20.
 
-Using the `californa` data, we can plot the posterior density for location `x = (lat = 41.24, lon = -120.79)` as
+To use `BMEmapping`, the user must first fit a variogram to the data. This involves extracting the variogram model and its corresponding parameters, which include `model`, `nugget`, `sill`, and `range`. A recommended tool for this process is the `gstat` package, which provides robust functionality for variogram fitting. The BMEmapping package supports three types of variogram models: Exponential, Gaussian, and Spherical. Each of these models can be selected based on the characteristics of the spatial data being analyzed.
+
+Using the `utah` data, we can plot the posterior density for location `x = (lat = 394835.1, lon = 4477333)` as
 
 ```{r fig.width = 6, fig.height = 4, fig.align='center'}
 # prediction location
@@ -100,7 +113,7 @@ sill <- 0.3474
 range <- 119197
 
 # specify nsmax
-nsmax <- 5
+nsmax <- 10
 nhmax <- 10
 
 # plot posterior pdf
@@ -108,13 +121,7 @@ posterior_plot(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 ```
 
 
-The BME predictions available in this package are the posterior mode (`bme_mode`) and posterior mean (`bme_mean`) predictions. The `bme_mode` predictions which represents the most probable realization is the value that maximizes the the posterior pdf is defined as
-
-\begin{equation}
-\hat{z}_k = {arg}  \hspace{0.15em} {max} \hspace{0.2em} f_{\mathcal{K}}(z_k)
-\end{equation}
-
-The `bme_mode` function takes the same arguments as the `posterior_plot` function. Given the data above, we can predict the mode of the posterior density at location `x = (lat = 41.24, lon = -120.79)` by
+The `bme_predict` function accepts the same arguments as the `posterior_plot` function, with the addition of a `type` argument, which specifies the preferred type of prediction (either the posterior mean or mode). Using the data provided, we can predict the mean and mode of the posterior density at the location `x = (lat = 394835.1, lon = 4477333)` by:
 
 ```{r}
 # posterior mode
@@ -122,28 +129,14 @@ bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax,
             type = "mode")
 ```
 
-The `bme_mean` prediction which is a nonlinear function of the available data and aims to minimize the squared prediction error is defined as the posterior mean  
-\begin{equation}\label{eqn:post-mean}
-\bar{z}_{k|\mathcal{K}} = \int z_k f_{\mathcal{K}}(z_k)d z_k, 
-\end{equation}
 
-The `bme_mean` function takes the same arguments as the `bme_mode` function. Given the data above, we can predict the posterior mean at location `x = (lat = 41.24, lon = -120.79)` by
+Cross-validation (CV) is a widely used technique for evaluating the performance and generalizability of a model. It works by splitting the dataset into multiple subsets, or "folds." The model is trained on some of these folds and tested on the remaining fold, with this process repeated for each fold. This approach ensures that the model's performance is not overly influenced by any single subset of the data, thereby minimizing the risk of overfitting.
+
+In this case, we use leave-one-out cross-validation (LOOCV) with the `bme_cv` function. The `bme_cv` function requires that the number of hard data locations be sufficiently large (at least 20). It takes the same arguments as the `bme_predict` function.
+
+Given the data, we can apply the LOOCV technique for predicting the posterior mean as follows:
 
 ```{r}
-# posterior mean
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
-            type = "mean")
-```
-
-Cross-validation (CV) is a technique used to assess the performance and generalizability of a model. It involves splitting the dataset into multiple subsets, or "folds." The model is trained on some folds and tested on the remaining fold, and this process is repeated for each fold. This helps ensure that the model's performance is not overly dependent on any single subset of the data, reducing the risk of overfitting. Common types of CV include k-fold and leave-one-out, each offering a different way of partitioning the data to improve model evaluation.
-
-Here we employ both leave-one-out and k-fold CV depending on our preference and choice of prediction using the `bme-cv` function. The `bme-cv` function requires the number hard data locations (`nrow(ch)') to be 50 or more. The `bme-cv` function takes the arguments: `ch, cs, zh, a, b, nugget, sill, range, nsmax` and two additional arguments;
-
-* `estimate`: is the choice of prediction (`bme_mean` or `bme_mode`).
-* `k`: is the type of CV preferred. If LOOCV is preferred, choose `k` = `nrow(ch)` otherwise `k` can be 5 or 10 for k-fold CV. 
-
-Given data, we can employ the LOOCV technique for the posterior mean as
-```{r eval=FALSE}
 DF <- bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
              type = "mean")
 head(DF, 10)
