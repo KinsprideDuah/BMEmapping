@@ -4,7 +4,7 @@ Title: Spatial Interpolation using Bayesian Maximum Entropy (BME)
 Version: 0.1.0
 Authors@R: 
     c(person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
-    role = c("aut", "cre"), comment = c(ORCID = "0009-0004-3990-7985")),
+    role = c("aut", "cre")),
     person("Yan", "Sun", email = "yan.sun@usu.edu", role = "aut"))
 Maintainer: Kinspride Duah <kinspride2020@gmail.com>
 Description: 
@@ -16,3 +16,6 @@ LazyData: true
 URL: https://github.com/KinsprideDuah/BMEmapping
 BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
 RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
