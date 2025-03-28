@@ -48,17 +48,17 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   cov_h_k <- covmat(ch, x, model, nugget, sill, range)
   cov_h_s <- covmat(ch, cs, model, nugget, sill, range)
 
-  cov_k_h <- t(cov_h_k)
+  cov_k_h <- covmat(x, ch, model, nugget, sill, range)
   cov_k_k <- covmat(x, x, model, nugget, sill, range)
 
-  cov_s_h <- t(cov_h_s)
+  cov_s_h <- covmat(cs, ch, model, nugget, sill, range)
   cov_s_s <- covmat(cs, cs, model, nugget, sill, range)
   diag(cov_s_s) <- diag(cov_s_s) + vs
 
   # Composite covariances
   cov_kh_kh <- rbind(cbind(cov_k_k, cov_k_h), cbind(cov_h_k, cov_h_h))
   cov_s_kh <- covmat(cs, rbind(x, ch), model, nugget, sill, range)
-  cov_kh_s <- t(cov_s_kh)
+  cov_kh_s <- covmat(rbind(x, ch), cs, model, nugget, sill, range)
 
 
   # range of zk values
@@ -74,14 +74,16 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   ###########################################################################
 
   # lower and upper limits
-  lower_a <- c(a - cov_s_h %*% solve(cov_h_h, zh))
-  upper_a <- c(b - cov_s_h %*% solve(cov_h_h, zh))
+  lower_a <- a # c(a - cov_s_h %*% solve(cov_h_h, zh))
+  upper_a <- b # c(b - cov_s_h %*% solve(cov_h_h, zh))
+
+  inv_cov_hs_hs <- solve(cov_h_h)
 
   # covariance matrix
-  cov_a <- cov_s_s - cov_s_h %*% solve(cov_h_h, cov_h_s)
+  cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
 
   # mean vector
-  mu_a <- ms
+  mu_a <- cov_s_h %*% inv_cov_hs_hs %*% zh
 
   aa <- mvtnorm::pmvnorm(
     lower = lower_a, upper = upper_a, mean = mu_a,
@@ -92,8 +94,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   pk <- numeric()
 
   # Part B: conditional mean and covariance of zk
-  m_k <- c(cov_k_h %*% solve(cov_h_h, zh)) # mean
-  cov_k <- cov_k_k - cov_k_h %*% solve(cov_h_h, cov_h_k) # covariance
+  m_k <- c(cov_k_h %*% inv_cov_hs_hs %*% zh) # mean
+  cov_k <- cov_k_k - cov_k_h %*% inv_cov_hs_hs %*% cov_h_k # covariance
 
   # Part C: compute integral of soft data
   # conditional variance
@@ -125,7 +127,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
     upper_soft <- c(b - cov_s_kh %*% inv_cov_kh_kh %*% zk_h)
 
     # conditional mean
-    m_soft <- ms
+    m_soft <- matrix(0, nsmax)
 
     # Compute multidimensional integral
     f_soft <- mvtnorm::pmvnorm(
@@ -133,8 +135,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
       sigma = cov_soft
     )[1]
 
-    if (f_soft == 0) {f_soft <- 1e-4}
-    if (aa == 0) {aa <- 1e-4}
+    #if (f_soft == 0) {f_soft <- 1e-4}
+    #if (aa == 0) {aa <- 1e-4}
 
     pk[i] <- (1 / aa) * f_zk * f_soft
   }
