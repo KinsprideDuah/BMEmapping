@@ -24,9 +24,9 @@ A data frame with 232 rows and 5 variables:
 utah
 }
 \description{
-A dataset containing the 67 hard data and 165 soft-interval data used in the
-analysis of Duah et. al. (2025). The 232 measurement locations
+A projected dataset containing the 67 hard data and 165 soft-interval data
+used in the analysis of Duah et. al. (2025). The 232 measurement locations
 included in the dataset are taken from The 2020 National Snow Load Study
-(Bean et. al., 2021).
+(Bean et. al., 2021). the data
 }
 \keyword{datasets}

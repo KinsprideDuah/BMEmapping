@@ -53,7 +53,7 @@ bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
     zk_mode <- d[which.max(d[, 2]), 1]
 
     # gather estimates
-    df[i, ] <- round(c(zk_mode, zk_mean, zk_var), 6)
+    df[i, ] <- c(zk_mode, zk_mean, zk_var)
   }
 
   return(df)

@@ -1,28 +1,41 @@
-# ============================================================================
-# Wrapper to the prob_zk function
-# Compute the posterior density of zk
-#
-# Inputs:
-# -  x matrix of estimation locations
-#
-# Details:
-# -  ch matrix of hard data locations
-# -  cs matrix of soft data locations
-# -  zh vector of hard data
-# -  a vector of lower bounds of soft data
-# -  b vector of lower bounds of soft data
-# -  model string name of covariance or variogram model
-# -  nugget a non-negative value
-# -  sill a non-negative value
-# -  range a non-negative value
-# -  nsmax number of soft data locations closer to the estimation location
-# -  nhmax number of hard data locations closer to the estimation location
-#
-# Outputs:
-# - A two column matrix of zk and associated probabilities
-# ============================================================================
+#' @title Posterior density function
+#'
+#' @details Compute the posterior densities of assumed zki values
+#'
+#' @returns A two column matrix of zk and associated probabilities
+#'
+#' @param x matrix of estimation locations. Cannot exceed 10 locations.
+#' @param ch matrix of hard data locations
+#' @param cs matrix of soft data locations
+#' @param zh vector of hard data
+#' @param a vector of lower bounds of soft data
+#' @param b vector of lower bounds of soft data
+#' @param model string name of covariance or variogram model
+#' @param nugget a non-negative value
+#' @param sill a non-negative value
+#' @param range a non-negative value
+#' @param nsmax number of soft data locations closer to the estimation location
+#' @param nhmax number of hard data locations closer to the estimation location
+#'
+#' @examples
+#' data("utah")
+#' x <- data.matrix(utah[1, c("lat", "lon")])
+#' ch <- data.matrix(utah[2:67, c("lat", "lon")])
+#' cs <- data.matrix(utah[68:232, c("lat", "lon")])
+#' zh <- c(utah[2:67, c("center")])
+#' a <- c(utah[68:232, c("lower")])
+#' b <- c(utah[68:232, c("upper")])
+#' model <- "sph"
+#' nugget <- 0.1184
+#' sill <- 0.3474
+#' range <- 119197
+#' nsmax <- 5
+#' nhmax <- 10
+#' prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+#'
+#' @export
 prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                    nsmax = 10, nhmax = 10) {
+                    nsmax = 10, nhmax = nrow(ch)) {
   set.seed(123)
 
   # sorting nhmax hard data locations closest to the estimation location
@@ -62,8 +75,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
 
 
   # range of zk values
-  zk_min <- min(c(zh, a))
-  zk_max <- max(c(zh, b))
+  zk_min <- min(c(zh, 0, a))
+  zk_max <- max(c(zh, 0, b))
 
   n <- 30
   zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
@@ -83,7 +96,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
 
   # mean vector
-  mu_a <- cov_s_h %*% inv_cov_hs_hs %*% zh
+  mu_a <- c(cov_s_h %*% inv_cov_hs_hs %*% zh)
 
   aa <- mvtnorm::pmvnorm(
     lower = lower_a, upper = upper_a, mean = mu_a,
@@ -94,7 +107,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   pk <- numeric()
 
   # Part B: conditional mean and covariance of zk
-  m_k <- c(cov_k_h %*% inv_cov_hs_hs %*% zh) # mean
+  m_k <- c(cov_k_h %*% solve(cov_h_h, zh)) # mean
   cov_k <- cov_k_k - cov_k_h %*% inv_cov_hs_hs %*% cov_h_k # covariance
 
   # Part C: compute integral of soft data
@@ -127,7 +140,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
     upper_soft <- c(b - cov_s_kh %*% inv_cov_kh_kh %*% zk_h)
 
     # conditional mean
-    m_soft <- matrix(0, nsmax)
+    m_soft <- rep(0, nsmax)
 
     # Compute multidimensional integral
     f_soft <- mvtnorm::pmvnorm(
@@ -135,13 +148,13 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
       sigma = cov_soft
     )[1]
 
-    #if (f_soft == 0) {f_soft <- 1e-4}
-    #if (aa == 0) {aa <- 1e-4}
+    if (f_soft == 0) {f_soft <- 1e-4}
+    if (aa == 0) {aa <- 1e-4}
 
-    pk[i] <- (1 / aa) * f_zk * f_soft
+    pk[i] <- round(((1 / aa) * f_zk * f_soft), 5)
   }
 
-  d <- matrix(c(zk_vec, pk), ncol = 2)
+  d <- data.frame(zki = zk_vec, f_zki = pk)
   df <- d[!rowSums(is.na(d)), ]
 
   return(df)
