@@ -75,8 +75,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
 
 
   # range of zk values
-  zk_min <- min(c(zh, 0, a))
-  zk_max <- max(c(zh, 0, b))
+  zk_min <- min(c(zh, a))
+  zk_max <- max(c(zh, b))
 
   n <- 30
   zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)

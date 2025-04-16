@@ -3,13 +3,15 @@
 \docType{data}
 \name{utah}
 \alias{utah}
-\title{A hard and soft-interval design ground snow load dataset for Utah.}
+\title{A projected hard and soft-interval design ground snow load dataset for Utah.}
 \format{
-A data frame with 232 rows and 5 variables:
+A data frame with 232 rows and 7 variables:
 
 \describe{
-\item{lat}{Latitude coordinate position}
-\item{lon}{Longitude coordinate position}
+\item{latitude}{Latitude coordinate position}
+\item{longitude}{Longitude coordinate position}
+\item{x}{Projected latitude coordinate}
+\item{y}{Projected longitude coordinate}
 \item{center}{The hard data value}
 \item{lower}{The lower endpoint of the soft-interval}
 \item{upper}{The upper endpoint of the soft-interval}
@@ -24,9 +26,10 @@ A data frame with 232 rows and 5 variables:
 utah
 }
 \description{
-A projected dataset containing the 67 hard data and 165 soft-interval data
-used in the analysis of Duah et. al. (2025). The 232 measurement locations
-included in the dataset are taken from The 2020 National Snow Load Study
-(Bean et. al., 2021). the data
+A dataset comprising 65 hard data points and 167 soft-interval data points,
+used in the analysis by Duah et al. (2025). The dataset includes 248
+measurement locations, which are derived from the 2020 National Snow Load
+Study (Bean et al., 2021). For a comprehensive understanding of the dataset
+and its usage, please refer to Duah et al. (2025).
 }
 \keyword{datasets}

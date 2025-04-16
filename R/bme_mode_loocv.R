@@ -36,5 +36,12 @@ bme_mode_loocv <- function(ch, cs, zh, a, b, model, nugget, sill, range,
   names(df) <- c("coord.1", "coord.2", "observed", "mode", "variance",
                  "residual", "fold")
 
-  return(df)
+  me <- mean(df$residual)
+  mae <- mean(abs(df$residual))
+  rmse <- sqrt(mean(df$residual^2))
+
+  metric <- cbind.data.frame(me, mae, rmse)
+  names(metric) <- c("ME", "MAE", "RMSE")
+
+  return(list(df, metric))
 }

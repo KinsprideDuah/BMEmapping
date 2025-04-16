@@ -37,6 +37,12 @@ bme_mean_loocv <- function(ch, cs, zh, a, b, model, nugget, sill, range,
   df <- cbind.data.frame(ch, zh, d, zh - d[ ,1], 1:n)
   names(df) <- c("coord.1", "coord.2", "observed", "mean", "variance",
                  "residual", "fold")
+  me <- mean(df$residual)
+  mae <- mean(abs(df$residual))
+  rmse <- sqrt(mean(df$residual^2))
 
-  return(df)
+  metric <- cbind.data.frame(me, mae, rmse)
+  names(metric) <- c("ME", "MAE", "RMSE")
+
+  return(list(df, metric))
 }

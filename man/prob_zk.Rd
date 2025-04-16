@@ -16,7 +16,7 @@ prob_zk(
   sill,
   range,
   nsmax = 10,
-  nhmax = 10
+  nhmax = nrow(ch)
 )
 }
 \arguments{
