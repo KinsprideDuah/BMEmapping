@@ -36,12 +36,6 @@
 #' @export
 posterior_plot <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
                            nsmax, nhmax) {
-  check_x(x)
-  check_matrix_or_dataframe(ch, "ch")
-  check_matrix_or_dataframe(cs, "cs")
-  check_vectors(zh, a, b)
-  check_lengths(ch, zh, cs, a, b)
-
   nk <- nrow(x)
 
   if (nk > 10) {

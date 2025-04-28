@@ -33,11 +33,15 @@ $~$
 
 The main functions available in `BMEmapping` include:
 
+mapping set
+
+`prob_zk` - computes the mapping set of an unobserved location.
+
+`posterior_plot` - plots the the posterior density of an unobserved location.
+
 `bme_predict` - predicts the posterior mean/mode and variance of an unobserved location.
 
 `bme_cv` - performs a cross-validation to check model performance.
-
-`posterior_plot` - plots the the posterior density of an unobserved location.
 
 
 $~$
@@ -62,39 +66,57 @@ $~$
   
 ## Prediction Exploration
   
-The `posterior_plot` functions require the following arguments:
-  
-* `x`: is the prediction geographic location
-* `ch`: is the geographic location of hard data
-* `cs`: is the geographic location of soft-interval data
-* `zh`: is the hard data values
-* `a`: is the lower bounds of the soft-interval data 
-* `b`: is the upper bounds of the soft-interval data 
-* `model`: type of variogram model (`"exp", "sph", "gau"`)
-* `nugget`: is the nugget of the variogram model
-* `sill`: is the sill of the variogram model 
-* `range`: is the range (or effective range) of the variogram model 
+### Data Requirements for BMEmapping
 
-The following arguments are optional:
-  
-* `nsmax`: is the number soft-interval data allowable in the integration process, If not specified, the default value is 10. Thus, the 10 closest soft data locations to the prediction location are to be used in the integration process. Generally, results for `nsmax` = 10 is very close to that of `nsmax` > 20.
+The `BMEmapping` functions require the following input arguments:
 
-To use `BMEmapping`, the user must first fit a variogram to the data. This involves extracting the variogram model and its corresponding parameters, which include `model`, `nugget`, `sill`, and `range`. A recommended tool for this process is the `gstat` package, which provides robust functionality for variogram fitting. The BMEmapping package supports three types of variogram models: Exponential, Gaussian, and Spherical. Each of these models can be selected based on the characteristics of the spatial data being analyzed.
+`x`: A vector specifying the geographic location(s) where predictions are to be made.
 
-Using the `utah` data, we can plot the posterior density for location `x = (lat = 394835.1, lon = 4477333)` as
+`ch`: A matrix or data frame containing the geographic coordinates of the hard data locations.
 
-```{r fig.width = 6, fig.height = 4, fig.align='center'}
-# prediction location
-x <- data.matrix(utah[1, c("lat", "lon")]) 
+`cs`: A matrix or data frame containing the geographic coordinates of the soft-interval data locations.
 
+`zh`: A vector of observed hard data values corresponding to the locations in `ch`.
+
+`a`: A vector of lower bounds for the soft-interval data at locations `cs`.
+
+`b`: A vector of upper bounds for the soft-interval data at locations `cs`.
+
+### Variography
+
+Before using `BMEmapping`, the user must fit a variogram model to the spatial data. This step involves specifying the type of variogram and its associated parameters:
+
+* `model`: The variogram model type. Supported options are "exp" (Exponential), "sph" (Spherical), and "gau" (Gaussian). The appropriate model should be selected based on the spatial structure of the data.
+
+* `nugget`: The nugget effect of the variogram, representing measurement error or microscale variation.
+
+* `sill`: The sill of the variogram, indicating the plateau value of the semivariance.
+
+* `range`: The range (or effective range) of the variogram, representing the distance beyond which spatial correlation becomes negligible.
+
+A recommended tool for variogram modeling is the \texttt{gstat} package, which provides a robust suite of functions for fitting and analyzing variograms.
+
+### Optional Parameters
+
+* `nhmax`: Maximum number of nearby hard data points to include in the integration process.
+
+* `nsmax`: Maximum number of nearby soft-interval data points to include.
+
+If these parameters are not specified, the function uses default values: `nhmax` = 10 and `nsmax` = 5. This means the integration step will automatically select the 10 nearest hard data points and the 5 nearest soft data points relative to each prediction location.
+
+
+### Practical Application Uisng the Utah dataset
+
+Using the `utah` data and the variogram parameters specified below,
+```{r}
 # hard data locations
-ch <- data.matrix(utah[2:40, c("lat", "lon")]) 
+ch <- data.matrix(utah[2:67, c("x", "y")]) 
 
 # soft data locations
-cs <- data.matrix(utah[68:232, c("lat", "lon")])  
+cs <- data.matrix(utah[68:232, c("x", "y")])  
 
 # hard data values
-zh <- c(utah[2:40, c("center")])
+zh <- c(utah[2:67, c("center")])
 
 # lower bounds
 a <- c(utah[68:232, c("lower")]) 
@@ -109,33 +131,51 @@ sill <- 0.3474
 range <- 119197
 
 # specify nsmax
-nsmax <- 10
+nsmax <- 5
 nhmax <- 10
 
-# plot posterior pdf
-posterior_plot(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+# prediction location
+x <- data.matrix(utah[1, c("x", "y")])
 ```
 
 
-The `bme_predict` function accepts the same arguments as the `posterior_plot` function, with the addition of a `type` argument, which specifies the preferred type of prediction (either the posterior mean or mode). Using the data provided, we can predict the mean and mode of the posterior density at the location `x = (lat = 394835.1, lon = 4477333)` by:
+The `prob_zk` function accepts all the data and variogram input arguments explained above. The mapping set for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
+```{r eval=FALSE}
+zk <- prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+
+#show first 10 rows 
+head(zk, 10)
+```
+
+The `posterior_plot` function accepts the same arguments as the `prob_zk` function. The posterior density for location `x = (lat = 394835.1, lon = 4477333)` can be shown by
+
+```{r fig.width = 6, fig.height = 4, fig.align='center'}
+posterior_plot(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+```
+
+The `bme_predict` function accepts the same arguments as the `prob_zk` function, with the addition of a `type` argument, which specifies the preferred type of prediction (either the posterior mean or mode). Using the data provided, we can predict the mean and mode of the posterior density at the location `x = (lat = 394835.1, lon = 4477333)` by:
 
 ```{r}
 # posterior mode
 bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
             type = "mode")
+
+# posterior mean
+bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
+            type = "mean")
 ```
 
 
 Cross-validation (CV) is a widely used technique for evaluating the performance and generalizability of a model. It works by splitting the dataset into multiple subsets, or "folds." The model is trained on some of these folds and tested on the remaining fold, with this process repeated for each fold. This approach ensures that the model's performance is not overly influenced by any single subset of the data, thereby minimizing the risk of overfitting.
 
-In this case, we use leave-one-out cross-validation (LOOCV) with the `bme_cv` function. The `bme_cv` function requires that the number of hard data locations be sufficiently large (at least 20). It takes the same arguments as the `bme_predict` function.
+In this case, we use leave-one-out cross-validation (LOOCV) with the `bme_cv` function. The `bme_cv` function requires that the number of hard data locations be sufficiently large (at least 20). It takes the same arguments as the `bme_predict` function. Given the data, we can apply the LOOCV technique for predicting the posterior mean as follows:
 
-Given the data, we can apply the LOOCV technique for predicting the posterior mean as follows:
+```{r eval=FALSE}
+# hard data 
+ch <- data.matrix(utah[1:10, c("x", "y")]) 
+zh <- c(utah[1:10, c("center")])
 
-```{r}
-DF <- bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
-             type = "mean")
-head(DF, 10)
+bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mean")
 ```
 
 

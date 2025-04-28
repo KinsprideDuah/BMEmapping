@@ -35,14 +35,27 @@
 #'
 #' @export
 prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                    nsmax = 10, nhmax = nrow(ch)) {
+                    nsmax = 5, nhmax = 10) {
   set.seed(123)
 
+  check_x(x, cs, ch)
+  check_matrix_or_dataframe(ch, "ch")
+  check_matrix_or_dataframe(cs, "cs")
+  check_vectors(zh, a, b)
+  check_lengths(ch, zh, cs, a, b)
+
+  x <- matrix(x, ncol = 2)
+
+  if (nrow(x) != 1) {
+    stop("Can only compute the mapping set for a single location")
+  }
+
+
   # sorting nhmax hard data locations closest to the estimation location
-  #new_ch <- ch_nhmax(x, ch, nhmax)
-  #ch <- new_ch[[1]]
-  #index_h <- new_ch[[2]]
-  #zh <- zh[index_h]
+  new_ch <- ch_nhmax(x, ch, nhmax)
+  ch <- new_ch[[1]]
+  index_h <- new_ch[[2]]
+  zh <- zh[index_h]
 
   # sorting nsmax hard data locations closest to the estimation location
   new_cs <- cs_nsmax(x, cs, nsmax)

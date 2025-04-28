@@ -24,12 +24,6 @@
 # ============================================================================
 bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
                          nsmax, nhmax) {
-  # data checks
-  check_x(x)
-  check_matrix_or_dataframe(ch, "ch")
-  check_matrix_or_dataframe(cs, "cs")
-  check_vectors(zh, a, b)
-  check_lengths(ch, zh, cs, a, b)
 
   x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
