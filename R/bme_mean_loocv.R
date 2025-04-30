@@ -28,7 +28,7 @@ bme_mean_loocv <- function(ch, cs, zh, a, b, model, nugget, sill, range,
   n <- nrow(ch)
   d <- matrix(NA, nrow = n, ncol = 2)
 
-  for (i in 1:20) {
+  for (i in 1:n) {
     d[i, ] <- bme_estimate(x = ch[i, ], ch = ch[-i,], cs, zh = zh[-i], a, b,
                            model, nugget, sill, range,
                            nsmax, nhmax)[, c(2, 3)]

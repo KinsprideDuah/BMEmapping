@@ -140,7 +140,7 @@ x <- data.matrix(utah[1, c("x", "y")])
 
 
 The `prob_zk` function accepts all the data and variogram input arguments explained above. The mapping set for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
-```{r eval=FALSE}
+```{r eval=F}
 zk <- prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 
 #show first 10 rows 

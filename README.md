@@ -1,21 +1,21 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## BMEmapping
-
-<!-- badges: start -->
-<!-- badges: end -->
-
 ### Spatial Interpolation for data comprising hard and soft-interval forms
 
-Bayesian maximum entropy (BME) is a generalized spatial interpolation
-method that processes both hard and soft data simultaneously to
-effectively account for both spatial uncertainty and measurement
-imprecision.
+The **Bayesian Maximum Entropy (BME)** framework provides a flexible and
+principled approach to space-time data analysis by combining Bayesian
+inference with the maximum entropy principle. It supports optimal
+estimation using both precise (hard) and uncertain (soft) data, such as
+intervals or probability distributions—making it ideal for complex,
+real-world datasets. The **BMEmapping** R package implements core BME
+methods for spatial interpolation, enabling the integration of
+heterogeneous data, variogram-based modeling, and uncertainty
+quantification.
 
 ## Installation
 
-You can install the development version of BMEmapping from
+You can install the development version of **BMEmapping** from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -25,13 +25,18 @@ devtools::install_github("KinsprideDuah/BMEmapping")
 
 ## Functions
 
+`prob_zk` - computes the mapping set of an unobserved location.
+
+`posterior_plot` - plots the the posterior density of an unobserved
+location.
+
 `bme_predict` - predicts the posterior mean/mode and variance of an
 unobserved location.
 
 `bme_cv` - performs a cross-validation to check model performance.
 
-`posterior_plot` - plots the the posterior density of an unobserved
-location.
+`sim_cholesky` - simulates multiple independent sets of zero-mean
+Gaussian.
 
 ## Getting help
 

@@ -19,20 +19,20 @@
 #' @param range a non-negative value
 #'
 #' @examples
-#' ch <- matrix(runif(10), ncol = 2)
+#' x <- matrix(runif(10), ncol = 2)
 #' model <- "sph"
 #' nugget <- 0
 #' sill <- 1
 #' range <- 1
-#' sim_cholesky(ch, model, nugget, sill, range)
+#' sim_cholesky(x, model, nugget, sill, range)
 #'
 #' @export
 #'
-sim_cholesky <- function(ch, model, nugget, sill, range) {
+sim_cholesky <- function(x, model, nugget, sill, range) {
 
-  K <- covmat(ch, ch, model, nugget, sill, range)
+  K <- covmat(x, x, model, nugget, sill, range)
   L <- chol(K, pivot = TRUE)
-  Zh <- as.vector(t(L) %*% rnorm(nrow(ch)))
+  Zh <- as.vector(t(L) %*% rnorm(nrow(x)))
 
   return(Zh)
 }

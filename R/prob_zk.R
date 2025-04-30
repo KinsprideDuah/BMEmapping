@@ -86,15 +86,6 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   cov_s_kh <- covmat(cs, rbind(x, ch), model, nugget, sill, range)
   cov_kh_s <- covmat(rbind(x, ch), cs, model, nugget, sill, range)
 
-
-  # range of zk values
-  zk_min <- min(c(zh, a))
-  zk_max <- max(c(zh, b))
-
-  n <- 30
-  zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
-
-
   ###########################################################################
   #   Part a: compute normalization constant
   ###########################################################################
@@ -107,6 +98,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
 
   # covariance matrix
   cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
+  if (det(cov_a) <= 0) {cov_a <- cov_s_s}
 
   # mean vector
   mu_a <- c(cov_s_h %*% inv_cov_hs_hs %*% zh)
@@ -127,6 +119,15 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   # conditional variance
   inv_cov_kh_kh <- solve(cov_kh_kh)
   cov_soft <- cov_s_s - cov_s_kh %*% inv_cov_kh_kh %*% cov_kh_s
+  if (det(cov_soft) <= 0) {cov_soft <- cov_s_s}
+
+  # range of zk values
+  zk_min <- min(c(zh, a))
+  zk_max <- max(c(zh, b))
+
+  n <- 100
+  zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
+
 
   for (i in 1:n) {
     ###########################################################################
