@@ -16,24 +16,27 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-Environmental data are often imprecise due to various limitations and uncertainties in the measuring process. As a result, they often consist of a combination of both precise and imprecise information, referred to as hard and soft data, respectively. Often in practice, soft data are characterized as intervals as a simple form to properly preserve the underlying imprecision. For instance, weather stations that record historical climate conditions do not provide exact measurements. The available measurements, in the mean time, are usually subject to various uncertainties and limitations. As a result, environmental and climate data are typically imprecise. Often in practice, soft data are characterized as intervals as a simple form to properly preserve the underlying imprecision. 
+The Bayesian Maximum Entropy (BME) framework offers a robust and versatile approach for space-time data analysis and uncertainty quantification. By integrating principles from Bayesian statistics and the maximum entropy formalism, BME enables the construction of optimal estimates for spatial or spatiotemporal processes, even in the presence of both precise (hard) and imprecise (soft) data. While hard data correspond to exact measurements, soft data may take the form of intervals, probability distributions, or qualitative descriptors, making BME particularly well-suited for complex real-world datasets.
 
-The `BMEmapping` package is used make spatial interpolations for unobserved locations using hard and soft-interval data. This vignette provides an overview of basic features in `BMEmapping`. We load `BMEmapping` by running
+The **BMEmapping** R package provides a user-friendly implementation of core BME methodologies, facilitating geostatistical modeling, prediction, and data fusion. It allows for the principled integration of heterogeneous data sources, incorporates prior knowledge, and supports variogram-based spatial modeling—essential tools for accurate and interpretable spatial interpolation.
 
-```{r setup, message=FALSE, warning=FALSE}
-library(ggplot2)  # For plots
+Specifically, **BMEmapping** is designed to perform spatial interpolation at unobserved locations using both hard and soft-interval data. This vignette introduces the fundamental functionality of the package and guides users through its basic usage.
 
+To begin, load the package with:
+
+```{r echo=FALSE, warning=FALSE}
+library(ggplot2)
+```
+
+
+```{r setup}
 library(BMEmapping)
 ```
 
 
-$~$
-
 ## Main Functions
 
-The main functions available in `BMEmapping` include:
-
-mapping set
+The main functions available in **BMEmapping** include:
 
 `prob_zk` - computes the mapping set of an unobserved location.
 
@@ -43,12 +46,14 @@ mapping set
 
 `bme_cv` - performs a cross-validation to check model performance.
 
+`sim_cholesky` - simulates multiple independent sets of zero-mean Gaussian.
+
 
 $~$
 
 ## A Data Example
 
-To introduce the functionality of `BMEmapping`, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utah` data that is part of the package and can be accessed by the command
+To introduce the functionality of **BMEmapping**, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utah` data that is part of the package and can be accessed by the command
 
 ```{r}
 data("utah")
@@ -61,14 +66,10 @@ and the documentation of the `utah` data can be found by invoking the command:
 ?utah
 ```
 
-
-$~$
-  
-## Prediction Exploration
   
 ### Data Requirements for BMEmapping
 
-The `BMEmapping` functions require the following input arguments:
+The **BMEmapping** functions require the following input arguments:
 
 `x`: A vector specifying the geographic location(s) where predictions are to be made.
 
@@ -94,29 +95,29 @@ Before using `BMEmapping`, the user must fit a variogram model to the spatial da
 
 * `range`: The range (or effective range) of the variogram, representing the distance beyond which spatial correlation becomes negligible.
 
-A recommended tool for variogram modeling is the \texttt{gstat} package, which provides a robust suite of functions for fitting and analyzing variograms.
+A recommended tool for variogram modeling is the **gstat** package, which provides a robust suite of functions for fitting and analyzing variograms.
 
 ### Optional Parameters
 
 * `nhmax`: Maximum number of nearby hard data points to include in the integration process.
 
-* `nsmax`: Maximum number of nearby soft-interval data points to include.
+* `nsmax`: Maximum number of nearby soft-interval data points to include n the integration process.
 
 If these parameters are not specified, the function uses default values: `nhmax` = 10 and `nsmax` = 5. This means the integration step will automatically select the 10 nearest hard data points and the 5 nearest soft data points relative to each prediction location.
 
 
-### Practical Application Uisng the Utah dataset
+### Prediction Exploration
 
 Using the `utah` data and the variogram parameters specified below,
 ```{r}
 # hard data locations
-ch <- data.matrix(utah[2:67, c("x", "y")]) 
+ch <- data.matrix(utah[2:20, c("x", "y")]) 
 
 # soft data locations
 cs <- data.matrix(utah[68:232, c("x", "y")])  
 
 # hard data values
-zh <- c(utah[2:67, c("center")])
+zh <- c(utah[2:20, c("center")])
 
 # lower bounds
 a <- c(utah[68:232, c("lower")]) 
@@ -130,9 +131,9 @@ nugget <- 0.1184
 sill <- 0.3474
 range <- 119197
 
-# specify nsmax
+# additional parameters
 nsmax <- 5
-nhmax <- 10
+nhmax <- 5
 
 # prediction location
 x <- data.matrix(utah[1, c("x", "y")])
@@ -140,7 +141,7 @@ x <- data.matrix(utah[1, c("x", "y")])
 
 
 The `prob_zk` function accepts all the data and variogram input arguments explained above. The mapping set for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
-```{r eval=F}
+```{r}
 zk <- prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 
 #show first 10 rows 
@@ -157,26 +158,65 @@ The `bme_predict` function accepts the same arguments as the `prob_zk` function,
 
 ```{r}
 # posterior mode
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
-            type = "mode")
+bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mode")
 
 # posterior mean
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, 
-            type = "mean")
+bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mean")
 ```
 
 
-Cross-validation (CV) is a widely used technique for evaluating the performance and generalizability of a model. It works by splitting the dataset into multiple subsets, or "folds." The model is trained on some of these folds and tested on the remaining fold, with this process repeated for each fold. This approach ensures that the model's performance is not overly influenced by any single subset of the data, thereby minimizing the risk of overfitting.
+### Leave-One-Out Cross-Validation (LOOCV) for Model Evaluation
 
-In this case, we use leave-one-out cross-validation (LOOCV) with the `bme_cv` function. The `bme_cv` function requires that the number of hard data locations be sufficiently large (at least 20). It takes the same arguments as the `bme_predict` function. Given the data, we can apply the LOOCV technique for predicting the posterior mean as follows:
+LOOCV is used to assess prediction accuracy by systematically removing one hard data point at a time—where true values are known—and predicting its value using the remaining hard data and the midpoints of soft-interval data. A variogram model is fitted to the reduced dataset, and the predicted value at the excluded location is compared to its observed value. Soft data locations are excluded from this process, as their true values are unobservable.
+
+The `bme_cv` function performs LOOCV for at hard data locations and returns key performance metrics, including **mean error (ME)**, **mean absolute error (MAE)**, and **root mean squared error (RMSE)** of the prediction residuals. These statistics offer insight into the model’s bias, average prediction accuracy, and the variability of prediction errors, respectively.
+
+Functionally, `bme_cv` accepts similar arguments as the `bme_predict` function. Given the necessary data inputs and variogram parameters, LOOCV can be applied to evaluate the posterior mean predictions as follows:
 
 ```{r eval=FALSE}
-# hard data 
-ch <- data.matrix(utah[1:10, c("x", "y")]) 
-zh <- c(utah[1:10, c("center")])
-
 bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mean")
+
+#> [[1]]
+#>    coord.1 coord.2    observed       mean   variance    residual fold
+#> 2  379535.4 4422050  0.12258678 -0.3333805 0.15675334  0.45596732    1
+#> 3  287875.9 4154157 -0.02302358  0.1533209 0.12043303 -0.17634452    2
+#> 4  248027.5 4153048  0.50354362 -0.2105528 0.30524092  0.71409645    3
+#> 5  626735.3 4352209 -0.68611327 -0.9842654 0.44350520  0.29815211    4
+#> 6  623308.4 4508700 -0.53000397 -0.7064621 0.07245835  0.17645818    5
+#> 7  593901.7 4496057 -0.71923519 -0.9121312 0.10925932  0.19289602    6
+#> 8  587585.2 4529287 -1.31503404 -1.2120869 0.07988129 -0.10294709    7
+#> 9  612294.9 4510746 -0.94879597 -0.6553507 0.04769710 -0.29344532    8
+#> 10 568204.9 4530192 -1.39798035 -1.2248797 0.10526924 -0.17310063    9
+#> 11 543765.9 4533337 -1.21900906 -0.7558048 0.09784625 -0.46320425   10
+#> 12 548226.6 4494511 -1.24787225 -1.0361362 0.05110308 -0.21173607   11
+#> 13 526248.0 4488851 -0.55027484 -0.3936822 0.09079546 -0.15659262   12
+#> 14 542108.0 4528887 -1.06708711 -0.7325954 0.17585558 -0.33449168   13
+#> 15 544762.0 4507810 -1.14044998 -1.1838506 0.06977316  0.04340066   14
+#> 16 534699.6 4492216 -0.94551554 -0.6005826 0.03635184 -0.34493298   15
+#> 17 516855.9 4523235 -0.83840015 -0.7223663 0.04373783 -0.11603383   16
+#> 18 583549.9 4513697 -1.24671792 -1.1051491 0.10676869 -0.14156882   17
+#> 19 510122.6 4516562 -0.65036211 -0.7024364 0.03414099  0.05207428   18
+#> 20 504225.3 4503236 -0.37127802 -0.3966839 0.04861639  0.02540585   19
+
+#> [[2]]
+#>            ME       MAE     RMSE
+#> 1 -0.02926037 0.2354131 0.288952
 ```
 
 
+### Spatial Data Simulation
+
+Spatial data simulation using the *Cholesky decomposition* of the covariance matrix is a reliable method for generating spatially correlated Gaussian data. It is particularly effective for producing a set of zero-mean, multivariate normal values that conform to a specified spatial covariance structure. This technique is most practical when working with a small number of hard data points (typically fewer than a few hundred), where the computational cost of decomposing the full covariance matrix remains manageable.
+
+Given a set of spatial locations, `x` and a specified variogram model with its associated parameters (`model`, `nugget`, `sill`, `range`), the `sim_cholesky` function generates zero-mean Gaussian values at those locations that respect the defined spatial covariance structure.
+
+```{r warning=FALSE}
+x <- matrix(runif(10), ncol = 2)
+model <- "sph"
+nugget <- 0
+sill <- 1
+range <- 1
+
+sim_cholesky(x, model, nugget, sill, range)
+```
 
