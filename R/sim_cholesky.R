@@ -8,11 +8,11 @@
 #'
 #' @returns A vector of simulated Gaussian values.
 #'
-#' @param ch matrix of coordinates representing the locations where hard data
-#'           will be simulated. Each row corresponds to the coordinate vector
-#'           of a simulation location, with the number of columns indicating the
-#'           spatial dimension. There are no restrictions on the dimensionality
-#'           of the space.
+#' @param x matrix of coordinates representing the locations where hard data
+#'          will be simulated. Each row corresponds to the coordinate vector
+#'          of a simulation location, with the number of columns indicating the
+#'          spatial dimension. There are no restrictions on the dimensionality
+#'          of the space.
 #' @param model string name of covariance or variogram model
 #' @param nugget a non-negative value
 #' @param sill a non-negative value
@@ -32,7 +32,7 @@ sim_cholesky <- function(x, model, nugget, sill, range) {
 
   K <- covmat(x, x, model, nugget, sill, range)
   L <- chol(K, pivot = TRUE)
-  Zh <- as.vector(t(L) %*% rnorm(nrow(x)))
+  Zh <- as.vector(t(L) %*% stats::rnorm(nrow(x)))
 
   return(Zh)
 }

@@ -42,9 +42,9 @@ Plots the posterior density of an estimation location
 }
 \examples{
 data("utah")
-x <- data.matrix(utah[1, c("lat", "lon")])
-ch <- data.matrix(utah[2:67, c("lat", "lon")])
-cs <- data.matrix(utah[68:232, c("lat", "lon")])
+x <- data.matrix(utah[1, c("x", "y")])
+ch <- data.matrix(utah[2:67, c("x", "y")])
+cs <- data.matrix(utah[68:232, c("x", "y")])
 zh <- c(utah[2:67, c("center")])
 a <- c(utah[68:232, c("lower")])
 b <- c(utah[68:232, c("upper")])

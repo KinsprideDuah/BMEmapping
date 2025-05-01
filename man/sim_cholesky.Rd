@@ -4,10 +4,10 @@
 \alias{sim_cholesky}
 \title{sim_cholesky function}
 \usage{
-sim_cholesky(ch, model, nugget, sill, range)
+sim_cholesky(x, model, nugget, sill, range)
 }
 \arguments{
-\item{ch}{matrix of coordinates representing the locations where hard data
+\item{x}{matrix of coordinates representing the locations where hard data
 will be simulated. Each row corresponds to the coordinate vector
 of a simulation location, with the number of columns indicating the
 spatial dimension. There are no restrictions on the dimensionality
@@ -35,11 +35,11 @@ distributed values, typically for a small number of hard data points
 (fewer than a few hundred).
 }
 \examples{
-ch <- matrix(runif(10), ncol = 2)
+x <- matrix(runif(10), ncol = 2)
 model <- "sph"
 nugget <- 0
 sill <- 1
 range <- 1
-sim_cholesky(ch, model, nugget, sill, range)
+sim_cholesky(x, model, nugget, sill, range)
 
 }

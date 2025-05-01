@@ -3,8 +3,8 @@
 # data
 data("utah")
 
-c1 <- data.matrix(utah[1:3, 1:2])
-c2 <- data.matrix(utah[4:5, 1:2])
+c1 <- data.matrix(utah[1:3, c("x", "y")])
+c2 <- data.matrix(utah[4:5, c("x", "y")])
 
 # variogram model and parameters
 model <- "sph"
