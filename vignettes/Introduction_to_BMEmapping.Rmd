@@ -16,9 +16,9 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-The Bayesian Maximum Entropy (BME) framework offers a robust and versatile approach for space-time data analysis and uncertainty quantification. By integrating principles from Bayesian statistics and the maximum entropy formalism, BME enables the construction of optimal estimates for spatial or spatiotemporal processes, even in the presence of both precise (hard) and imprecise (soft) data. While hard data correspond to exact measurements, soft data may take the form of intervals, probability distributions, or qualitative descriptors, making BME particularly well-suited for complex real-world datasets.
+The Bayesian Maximum Entropy (BME) framework offers a robust and versatile approach for space-time data analysis and uncertainty quantification. By integrating principles from Bayesian statistics and the maximum entropy formalism, BME enables the construction of optimal estimates for spatial or spatiotemporal processes in the presence of both precise (hard) and imprecise (soft) data. While hard data correspond to exact point-value measurements, soft data may take the flexible forms of intervals, probability distributions, or qualitative descriptors, making BME particularly well-suited for complex real-world datasets.
 
-The **BMEmapping** R package provides a user-friendly implementation of core BME methodologies, facilitating geostatistical modeling, prediction, and data fusion. It allows for the principled integration of heterogeneous data sources, incorporates prior knowledge, and supports variogram-based spatial modeling—essential tools for accurate and interpretable spatial interpolation.
+The **BMEmapping** R package provides a user-friendly implementation of core BME methodologies, facilitating geostatistical modeling, prediction, and data fusion. It allows for a systematic integration of heterogeneous data sources, incorporates prior knowledge, and supports variogram-based spatial modeling—essential tools for accurate and interpretable spatial interpolation.
 
 Specifically, **BMEmapping** is designed to perform spatial interpolation at unobserved locations using both hard and soft-interval data. This vignette introduces the fundamental functionality of the package and guides users through its basic usage.
 
@@ -38,13 +38,13 @@ library(BMEmapping)
 
 The main functions available in **BMEmapping** include:
 
-`prob_zk` - computes the mapping set of an unobserved location.
+`prob_zk` - computes the numerical estimation of the posterior density of an unobserved location.
 
 `posterior_plot` - plots the the posterior density of an unobserved location.
 
 `bme_predict` - predicts the posterior mean/mode and variance of an unobserved location.
 
-`bme_cv` - performs a cross-validation to check model performance.
+`bme_cv` - performs a cross-validation on the hard data to assess model performance.
 
 `sim_cholesky` - simulates multiple independent sets of zero-mean Gaussian.
 
@@ -67,7 +67,7 @@ and the documentation of the `utah` data can be found by invoking the command:
 ```
 
   
-### Data Requirements for BMEmapping
+### Input Requirements
 
 The **BMEmapping** functions require the following input arguments:
 
@@ -101,15 +101,19 @@ A recommended tool for variogram modeling is the **gstat** package, which provid
 
 * `nhmax`: Maximum number of nearby hard data points to include in the integration process.
 
-* `nsmax`: Maximum number of nearby soft-interval data points to include n the integration process.
+* `nsmax`: Maximum number of nearby soft-interval data points to include in the integration process.
 
 If these parameters are not specified, the function uses default values: `nhmax` = 10 and `nsmax` = 5. This means the integration step will automatically select the 10 nearest hard data points and the 5 nearest soft data points relative to each prediction location.
 
 
-### Prediction Exploration
+### BME Prediction
 
-Using the `utah` data and the variogram parameters specified below,
+Using the `utah` dataset, you can prepare the necessary input variables as shown below. In this example, we designate **Location 1** as the **prediction location**.
+
 ```{r}
+# prediction location
+x <- data.matrix(utah[1, c("x", "y")])
+
 # hard data locations
 ch <- data.matrix(utah[2:20, c("x", "y")]) 
 
@@ -135,12 +139,10 @@ range <- 119197
 nsmax <- 5
 nhmax <- 5
 
-# prediction location
-x <- data.matrix(utah[1, c("x", "y")])
 ```
 
 
-The `prob_zk` function accepts all the data and variogram input arguments explained above. The mapping set for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
+The `prob_zk` function accepts all the data and variogram input arguments explained above. The numerical estimation of the posterior density for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
 ```{r}
 zk <- prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 
@@ -167,7 +169,7 @@ bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type 
 
 ### Leave-One-Out Cross-Validation (LOOCV) for Model Evaluation
 
-LOOCV is used to assess prediction accuracy by systematically removing one hard data point at a time—where true values are known—and predicting its value using the remaining hard data and the midpoints of soft-interval data. A variogram model is fitted to the reduced dataset, and the predicted value at the excluded location is compared to its observed value. Soft data locations are excluded from this process, as their true values are unobservable.
+LOOCV is used to assess prediction accuracy by successively removing one hard data point at a time—where true values are known—and predicting its value using the remaining hard data and all of the soft-interval data. A variogram model is fitted to the reduced dataset, and the predicted value at the excluded location is compared to its observed value. Soft data locations are excluded from the validation set, as their true values are unobservable.
 
 The `bme_cv` function performs LOOCV for at hard data locations and returns key performance metrics, including **mean error (ME)**, **mean absolute error (MAE)**, and **root mean squared error (RMSE)** of the prediction residuals. These statistics offer insight into the model’s bias, average prediction accuracy, and the variability of prediction errors, respectively.
 

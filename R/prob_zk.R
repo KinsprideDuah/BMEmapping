@@ -30,12 +30,12 @@
 #' sill <- 0.3474
 #' range <- 119197
 #' nsmax <- 5
-#' nhmax <- 10
+#' nhmax <- 5
 #' prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 #'
 #' @export
 prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                    nsmax = 5, nhmax = 10) {
+                    nsmax = 5, nhmax = 5) {
   set.seed(123)
 
   check_x(x, cs, ch)
@@ -49,6 +49,13 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   if (nrow(x) != 1) {
     stop("Can only compute the mapping set for a single location")
   }
+
+  # range of zk values
+  zk_min <- -2 # min(c(zh, a))
+  zk_max <- 2 # max(c(zh, b))
+
+  n <- 50
+  zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
 
 
   # sorting nhmax hard data locations closest to the estimation location
@@ -122,11 +129,11 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   if (det(cov_soft) <= 0) {cov_soft <- cov_s_s}
 
   # range of zk values
-  zk_min <- min(c(zh, a))
-  zk_max <- max(c(zh, b))
+  #zk_min <- min(c(zh, a))
+  #zk_max <- max(c(zh, b))
 
-  n <- 100
-  zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
+  #n <- 50
+  #zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
 
 
   for (i in 1:n) {
