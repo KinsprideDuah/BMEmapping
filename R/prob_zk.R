@@ -1,18 +1,20 @@
 #' @title Posterior density function
 #'
-#' @details Compute the posterior densities of assumed zki values
+#' @details Computes the numerical estimation of the posterior density of a
+#'          single unobserved location.
+
 #'
-#' @returns A two column matrix of zk and associated probabilities
+#' @returns A two column matrix of zk and associated probabilities.
 #'
-#' @param x matrix of estimation locations. Cannot exceed 10 locations.
+#' @param x matrix of estimation locations. Cannot exceed 1 locations
 #' @param ch matrix of hard data locations
 #' @param cs matrix of soft data locations
 #' @param zh vector of hard data
 #' @param a vector of lower bounds of soft data
 #' @param b vector of lower bounds of soft data
 #' @param model string name of covariance or variogram model
-#' @param nugget a non-negative value
-#' @param sill a non-negative value
+#' @param nugget a value
+#' @param sill a value
 #' @param range a non-negative value
 #' @param nsmax number of soft data locations closer to the estimation location
 #' @param nhmax number of hard data locations closer to the estimation location
@@ -51,8 +53,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   }
 
   # range of zk values
-  zk_min <- -2 # min(c(zh, a))
-  zk_max <- 2 # max(c(zh, b))
+  zk_min <- min(c(zh, a, -2))
+  zk_max <- max(c(zh, b, 2))
 
   n <- 50
   zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
@@ -127,14 +129,6 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   inv_cov_kh_kh <- solve(cov_kh_kh)
   cov_soft <- cov_s_s - cov_s_kh %*% inv_cov_kh_kh %*% cov_kh_s
   if (det(cov_soft) <= 0) {cov_soft <- cov_s_s}
-
-  # range of zk values
-  #zk_min <- min(c(zh, a))
-  #zk_max <- max(c(zh, b))
-
-  #n <- 50
-  #zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
-
 
   for (i in 1:n) {
     ###########################################################################

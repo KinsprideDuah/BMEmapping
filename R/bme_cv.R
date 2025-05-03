@@ -1,10 +1,11 @@
 #' @title bme_cv function
 #'
-#' @details Leave-one-out cross validation (LOOCV) function to compute
-#'          predictions for ONLY hard data locations.
+#' @details Leave-one-out cross validation (LOOCV) function to compute and
+#'          assess predictions for ONLY hard data locations.
 #'
-#' @returns Data frame of estimation locations with their corresponding
-#'          predictions, residuals and folds.
+#' @returns A list of two data frames: the first contains estimation locations
+#'          with predictions, residuals, and fold assignments; the second
+#'          provides prediction accuracy metrics.
 #'
 #' @param ch matrix of hard data locations
 #' @param cs matrix of soft data locations
@@ -12,14 +13,13 @@
 #' @param a vector of lower bounds of soft data
 #' @param b vector of lower bounds of soft data
 #' @param model string name of covariance or variogram model
-#' @param nugget a non-negative value
-#' @param sill a non-negative value
+#' @param nugget a value
+#' @param sill a value
 #' @param range a non-negative value
 #' @param nsmax number of soft data locations closer to the estimation location
 #' @param nhmax number of hard data locations closer to the estimation location
-#' @param type string name for the type of prediction preferred. Type of
-#'        prediction can either be "mean" (posterior mean) or "mode" (posterior
-#'        mode)
+#' @param type a string specifying the preferred prediction type: either "mean"
+#'        for the posterior mean or "mode" for the posterior mode.
 #'
 #' @examples
 #' data("utah")

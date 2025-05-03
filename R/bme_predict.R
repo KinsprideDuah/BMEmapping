@@ -12,14 +12,14 @@
 #' @param a vector of lower bounds of soft data
 #' @param b vector of lower bounds of soft data
 #' @param model string name of covariance or variogram model
-#' @param nugget a non-negative value
-#' @param sill a non-negative value
+#' @param nugget a value
+#' @param sill a value
 #' @param range a non-negative value
 #' @param nsmax number of soft data locations closer to the estimation location
 #' @param nhmax number of hard data locations closer to the estimation location
-#' @param type string name for the type of prediction preferred. Type of
-#'        prediction can either be "mean" (posterior mean) or "mode" (posterior
-#'        mode)
+#' @param type a string specifying the preferred prediction type: either "mean"
+#'        for the posterior mean or "mode" for the posterior mode.
+#'
 #'
 #' @import mvtnorm
 #'
