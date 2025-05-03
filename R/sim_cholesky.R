@@ -1,10 +1,14 @@
 #' @title sim_cholesky function
 #'
 #' @details This method implements the traditional non-conditional simulation
-#'          using Cholesky decomposition of the covariance matrix. It is ideal
+#'          using Cholesky decomposition of the covariance matrix. This method
+#'          implements the traditional non-conditional simulation. Cholesky
+#'          decomposition is a matrix factorization technique used primarily for
+#'          symmetric, positive-definite matrices. It expresses a matrix as the
+#'          product of a lower triangular matrix and its transpose. It is ideal
 #'          for generating multiple independent sets of zero-mean Gaussian
-#'          distributed values, typically for a small number of hard data points
-#'          (fewer than a few hundred).
+#'          distributed values, typically for a small number of hard data
+#'          points.
 #'
 #' @returns A vector of simulated Gaussian values.
 #'

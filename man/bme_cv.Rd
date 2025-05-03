@@ -19,9 +19,9 @@ bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type)
 
 \item{model}{string name of covariance or variogram model}
 
-\item{nugget}{a non-negative value}
+\item{nugget}{a value}
 
-\item{sill}{a non-negative value}
+\item{sill}{a value}
 
 \item{range}{a non-negative value}
 
@@ -29,20 +29,20 @@ bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type)
 
 \item{nhmax}{number of hard data locations closer to the estimation location}
 
-\item{type}{string name for the type of prediction preferred. Type of
-prediction can either be "mean" (posterior mean) or "mode" (posterior
-mode)}
+\item{type}{a string specifying the preferred prediction type: either "mean"
+for the posterior mean or "mode" for the posterior mode.}
 }
 \value{
-Data frame of estimation locations with their corresponding
-predictions, residuals and folds.
+A list of two data frames: the first contains estimation locations
+with predictions, residuals, and fold assignments; the second
+provides prediction accuracy metrics.
 }
 \description{
 bme_cv function
 }
 \details{
-Leave-one-out cross validation (LOOCV) function to compute
-predictions for ONLY hard data locations.
+Leave-one-out cross validation (LOOCV) function to compute and
+assess predictions for ONLY hard data locations.
 }
 \examples{
 data("utah")

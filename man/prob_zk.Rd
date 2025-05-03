@@ -7,7 +7,7 @@
 prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 5)
 }
 \arguments{
-\item{x}{matrix of estimation locations. Cannot exceed 10 locations.}
+\item{x}{matrix of estimation locations. Cannot exceed 1 locations}
 
 \item{ch}{matrix of hard data locations}
 
@@ -21,9 +21,9 @@ prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 5)
 
 \item{model}{string name of covariance or variogram model}
 
-\item{nugget}{a non-negative value}
+\item{nugget}{a value}
 
-\item{sill}{a non-negative value}
+\item{sill}{a value}
 
 \item{range}{a non-negative value}
 
@@ -32,13 +32,14 @@ prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 5)
 \item{nhmax}{number of hard data locations closer to the estimation location}
 }
 \value{
-A two column matrix of zk and associated probabilities
+A two column matrix of zk and associated probabilities.
 }
 \description{
 Posterior density function
 }
 \details{
-Compute the posterior densities of assumed zki values
+Computes the numerical estimation of the posterior density of a
+single unobserved location.
 }
 \examples{
 data("utah")

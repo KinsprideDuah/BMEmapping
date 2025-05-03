@@ -35,9 +35,9 @@ bme_predict(
 
 \item{model}{string name of covariance or variogram model}
 
-\item{nugget}{a non-negative value}
+\item{nugget}{a value}
 
-\item{sill}{a non-negative value}
+\item{sill}{a value}
 
 \item{range}{a non-negative value}
 
@@ -45,9 +45,8 @@ bme_predict(
 
 \item{nhmax}{number of hard data locations closer to the estimation location}
 
-\item{type}{string name for the type of prediction preferred. Type of
-prediction can either be "mean" (posterior mean) or "mode" (posterior
-mode)}
+\item{type}{a string specifying the preferred prediction type: either "mean"
+for the posterior mean or "mode" for the posterior mode.}
 }
 \value{
 Data frame of estimation locations with their corresponding BME

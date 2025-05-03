@@ -21,9 +21,9 @@ posterior_plot(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 
 \item{model}{string name of covariance or variogram model}
 
-\item{nugget}{a non-negative value}
+\item{nugget}{a value}
 
-\item{sill}{a non-negative value}
+\item{sill}{a value}
 
 \item{range}{a non-negative value}
 

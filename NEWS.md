@@ -1,9 +1,9 @@
 # BMEmapping (development version)
 
 * Improved error messaging when processing invalid spatial objects or 
-inference structures (#206).
+inference structures.
 
-# BMEmapping 1.0.0
+# BMEmapping 0.1.0
 
 ## Major Features
 
@@ -12,11 +12,11 @@ including point and areal data.
 
 ## Minor Improvements and Bug Fixes
 
-* Improved printing and summary methods for BME model objects (#100).
+* Improved printing and summary methods for BME model objects.
 
 * Remove some suggested packages and simplified vignette.
 
 * Added Yan Sun as package author.
 
 * Enhanced numerical stability and runtime efficiency during entropy-based 
-interpolation (#200).
+interpolation.
