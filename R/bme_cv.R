@@ -23,9 +23,9 @@
 #'
 #' @examples
 #' data("utah")
-#' ch <- data.matrix(utah[2:67, c("x", "y")])
+#' ch <- data.matrix(utah[2:10, c("x", "y")])
 #' cs <- data.matrix(utah[68:232, c("x", "y")])
-#' zh <- c(utah[2:67, c("center")])
+#' zh <- c(utah[2:10, c("center")])
 #' a <- c(utah[68:232, c("lower")])
 #' b <- c(utah[68:232, c("upper")])
 #' model <- "sph"
@@ -33,7 +33,7 @@
 #' sill <- 0.3474
 #' range <- 119197
 #' nsmax <- 5
-#' nhmax <- 10
+#' nhmax <- 5
 #' type <- "mean"
 #' bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type)
 #'

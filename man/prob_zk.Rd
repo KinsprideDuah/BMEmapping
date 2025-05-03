@@ -4,7 +4,7 @@
 \alias{prob_zk}
 \title{Posterior density function}
 \usage{
-prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 10)
+prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 5)
 }
 \arguments{
 \item{x}{matrix of estimation locations. Cannot exceed 10 locations.}
@@ -53,7 +53,7 @@ nugget <- 0.1184
 sill <- 0.3474
 range <- 119197
 nsmax <- 5
-nhmax <- 10
+nhmax <- 5
 prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
 
 }
