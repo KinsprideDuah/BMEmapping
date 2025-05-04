@@ -1,5 +1,6 @@
 # BMEmapping (development version)
 
+<<<<<<< HEAD
 * Improved error messaging when processing invalid spatial objects or 
 inference structures.
 
@@ -20,3 +21,6 @@ including point and areal data.
 
 * Enhanced numerical stability and runtime efficiency during entropy-based 
 interpolation.
+=======
+* Initial CRAN submission.
+>>>>>>> 1d3f5429b8d155bb7d408946f995b9ee1d470021
