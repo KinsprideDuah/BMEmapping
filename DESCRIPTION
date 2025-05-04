@@ -5,7 +5,7 @@ Version: 0.1.0
 Authors@R: c(
     person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
     role = c("aut", "cre", "cph"), comment = c(ORCID = "0009-0004-3990-7985")),
-    person("Yan", "Sun", email = "yan.sun@usu.edu", role = "aut")
+    person("Yan", "Sun", email = "yan.sun@usu.edu", role = "aut"))
 Maintainer: Kinspride Duah <kinspride2020@gmail.com>
 Description: 
     Provides an accessible and robust implementation of core BME 
