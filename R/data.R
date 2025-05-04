@@ -19,8 +19,7 @@
 #'               lower, upper and center values are the same. Indirect
 #'               measurements have LOWER < RTSL < UPPER.}
 #' }
-#' @source
-#' * [The 2020 National Snow Load Study](https://doi.org/10.26077/200k-pr86)
+#' @source \url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
 "california"
 
 #' A projected hard and soft-interval design ground snow load dataset for Utah.
@@ -42,6 +41,5 @@
 #'  \item{lower}{The lower endpoint of the soft-interval}
 #'  \item{upper}{The upper endpoint of the soft-interval}
 #'  }
-#' @source
-#' * [The 2020 National Snow Load Study](https://doi.org/10.26077/200k-pr86)
+#' @source \url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
 "utah"
