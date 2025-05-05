@@ -18,9 +18,7 @@ A data frame with 232 rows and 7 variables:
 }
 }
 \source{
-\itemize{
-\item \href{https://doi.org/10.26077/200k-pr86}{The 2020 National Snow Load Study}
-}
+\url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
 }
 \usage{
 utah

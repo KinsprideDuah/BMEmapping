@@ -22,9 +22,7 @@ measurements have LOWER < RTSL < UPPER.}
 }
 }
 \source{
-\itemize{
-\item \href{https://doi.org/10.26077/200k-pr86}{The 2020 National Snow Load Study}
-}
+\url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
 }
 \usage{
 california
