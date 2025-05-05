@@ -1,4 +1,4 @@
-# BMEmapping (development version)
+# BMEmapping 0.2.0
 
 <<<<<<< HEAD
 * Improved error messaging when processing invalid spatial objects or 
