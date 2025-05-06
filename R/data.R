@@ -24,8 +24,8 @@
 
 #' A projected hard and soft-interval design ground snow load dataset for Utah.
 #'
-#' A dataset comprising 65 hard data points and 167 soft-interval data points,
-#' used in the analysis by Duah et al. (2025). The dataset includes 248
+#' A dataset comprising 65 hard data points and 167 soft-interval data,
+#' used in the analysis by Duah et al. (2025). The dataset includes 232
 #' measurement locations, which are derived from the 2020 National Snow Load
 #' Study (Bean et al., 2021). For a comprehensive understanding of the dataset
 #' and its usage, please refer to Duah et al. (2025).

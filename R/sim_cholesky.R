@@ -38,7 +38,7 @@ sim_cholesky <- function(x, model, nugget, sill, range) {
   L <- chol(K, pivot = TRUE)
   Zh <- as.vector(t(L) %*% stats::rnorm(nrow(x)))
 
-  return(Zh)
+  return(round(Zh, 4))
 }
 
 
