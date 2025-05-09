@@ -25,20 +25,14 @@ devtools::install_github("KinsprideDuah/BMEmapping")
 
 ## Functions
 
-`prob_zk` - computes the numerical estimation of the posterior density
-of an unobserved location.
+`prob_zk` - computes and optionally plots the posterior density estimate
+at a single unobserved location.
 
-`posterior_plot` - plots the the posterior density of an unobserved
-location.
-
-`bme_predict` - predicts the posterior mean/mode and variance of an
-unobserved location.
+`bme_predict` - predicts the posterior mean or mode and the associated
+variance at an unobserved location.
 
 `bme_cv` - performs a cross-validation on the hard data to assess model
 performance.
-
-`sim_cholesky` - simulates multiple independent sets of zero-mean
-Gaussian.
 
 ## Getting help
 

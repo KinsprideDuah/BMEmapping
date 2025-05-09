@@ -12,7 +12,7 @@ check_x <- function(x, ch, cs) {
 
   y <- rbind(ch, cs)
   if (any(apply(y, 1, function(row) all(row == x))) == TRUE) {
-    stop("The prediction location cannot be part of the data locations, ch and cs")
+    stop("The prediction location cannot be part of the data locations: ch and cs")
   }
 }
 

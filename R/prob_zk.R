@@ -1,44 +1,76 @@
-#' @title Posterior density function
+#' @title Posterior Density Estimation at a Single Location
 #'
-#' @details Computes the numerical estimation of the posterior density of a
-#'          single unobserved location.
-
+#' @description
+#' Computes the posterior and plots probability density function (PDF) at a
+#' single unobserved spatial location using the Bayesian Maximum Entropy (BME)
+#' framework. This function integrates both hard data (precise measurements) and
+#' soft data (interval or uncertain observations), together with a specified
+#' variogram model, to numerically estimate the posterior density across a
+#' range of possible values. Optionally displays a plot of the posterior density
+#' function for the specified location.
 #'
-#' @returns A two column matrix of zk and associated probabilities.
+#' @return Two elements:
+#' \describe{
+#'   \item{\emph{data frame}}{A data frame with two columns: \code{zk_i}
+#'   (assumed zk values) and \code{prob_zk_i} (corresponding posterior
+#'   densities).}
+#'   \item{\emph{plot}}{An optional plot of posterior density of the estimation
+#'   location.}
+#' }
 #'
-#' @param x matrix of estimation locations. Cannot exceed 1 locations
-#' @param ch matrix of hard data locations
-#' @param cs matrix of soft data locations
-#' @param zh vector of hard data
-#' @param a vector of lower bounds of soft data
-#' @param b vector of lower bounds of soft data
-#' @param model string name of covariance or variogram model
-#' @param nugget a value
-#' @param sill a value
-#' @param range a non-negative value
-#' @param nsmax number of soft data locations closer to the estimation location
-#' @param nhmax number of hard data locations closer to the estimation location
+#' @usage prob_zk(x, ch, cs, zh, a, b,
+#'         model, nugget, sill, range, nsmax = 5,
+#'         nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+#'         plot = FALSE)
+#'
+#' @param x A two-column matrix of spatial coordinates for a single estimation
+#'        location.
+#' @param ch A two-column matrix of spatial coordinates for hard data locations.
+#' @param cs A two-column matrix of spatial coordinates for soft (interval) data
+#'        locations.
+#' @param zh A numeric vector of observed values at the hard data locations.
+#' @param a A numeric vector of lower bounds for the soft interval data.
+#' @param b A numeric vector of upper bounds for the soft interval data.
+#' @param model A string specifying the variogram or covariance model to use
+#'        (e.g., \code{"exp"}, \code{"sph"}, etc.).
+#' @param nugget A non-negative numeric value for the nugget effect in the
+#'        variogram model.
+#' @param sill A numeric value representing the sill (total variance) in the
+#'        variogram model.
+#' @param range A positive numeric value for the range (or effective range)
+#'        parameter of the variogram model.
+#' @param nsmax An integer specifying the maximum number of nearby soft data
+#'        points to include for estimation (default is 5).
+#' @param nhmax An integer specifying the maximum number of nearby hard data
+#'        points to include for estimation (default is 5).
+#' @param n An integer indicating the number of points at which to evaluate the
+#'        posterior density over \code{zk_range} (default is 50).
+#' @param zk_range A numeric vector specifying the range over which to evaluate
+#'        the unobserved value at the estimation location (\code{zk}). Although
+#'        \code{zk} is unknown,  it is assumed to lie within a range similar to
+#'        the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
+#'        to explore the posterior distribution at a few locations using
+#'        \code{prob_zk()} before finalizing this range. The default is
+#'        \code{c(min(zh, a, -2), max(zh, b, 2)}.
+#' @param n An integer indicating the number of points at which to evaluate the
+#'        posterior density over \code{zk_range}.
+#' @param plot Logical; if \code{TRUE}, plots the posterior density curve.
 #'
 #' @examples
-#' data("utah")
-#' x <- data.matrix(utah[1, c("x", "y")])
-#' ch <- data.matrix(utah[2:67, c("x", "y")])
-#' cs <- data.matrix(utah[68:232, c("x", "y")])
-#' zh <- c(utah[2:67, c("center")])
-#' a <- c(utah[68:232, c("lower")])
-#' b <- c(utah[68:232, c("upper")])
-#' model <- "sph"
-#' nugget <- 0.1184
-#' sill <- 0.3474
-#' range <- 119197
-#' nsmax <- 5
-#' nhmax <- 5
-#' prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+#' data("utsnowload")
+#' x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
+#' ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
+#' cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
+#' zh <- utsnowload[2:67, "hard"]
+#' a <- utsnowload[68:232, "lower"]
+#' b <- utsnowload[68:232, "upper"]
+#' prob_zk(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953, sill = 0.3639,
+#'         range = 1.0787, plot = TRUE)
 #'
 #' @export
-prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                    nsmax = 5, nhmax = 5) {
-  set.seed(123)
+prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
+                    nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+                    plot = FALSE) {
 
   check_x(x, cs, ch)
   check_matrix_or_dataframe(ch, "ch")
@@ -52,12 +84,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
     stop("Can only compute the mapping set for a single location")
   }
 
-  # range of zk values
-  zk_min <- min(c(zh, a, -2))
-  zk_max <- max(c(zh, b, 2))
-
-  n <- 50
-  zk_vec <- seq(from = zk_min, to = zk_max, length.out = n)
+  # set up zk vector
+  zk_vec <- seq(from = zk_range[1], to = zk_range[2], length.out = n)
 
 
   # sorting nhmax hard data locations closest to the estimation location
@@ -73,10 +101,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   a <- a[index_s]
   b <- b[index_s]
 
-  # additional mean and variance of soft data
-  ms <- 1 / 2 * (b + a)
-  #ms <- rep(0, nsmax)
-  vs <- 1 / 12 * (b - a)^2
+  # additional variance of soft data
+  vs <- (b - a)^2 / 12
 
   # Build the covariance matrix
   cov_h_h <- covmat(ch, ch, model, nugget, sill, range)
@@ -100,14 +126,14 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   ###########################################################################
 
   # lower and upper limits
-  lower_a <- a # c(a - cov_s_h %*% solve(cov_h_h, zh))
-  upper_a <- b # c(b - cov_s_h %*% solve(cov_h_h, zh))
+  lower_a <- a
+  upper_a <- b
 
   inv_cov_hs_hs <- solve(cov_h_h)
 
   # covariance matrix
   cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
-  if (det(cov_a) <= 0) {cov_a <- cov_s_s}
+  if (det(cov_a) <= 0) cov_a <- cov_s_s
 
   # mean vector
   mu_a <- c(cov_s_h %*% inv_cov_hs_hs %*% zh)
@@ -128,16 +154,16 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   # conditional variance
   inv_cov_kh_kh <- solve(cov_kh_kh)
   cov_soft <- cov_s_s - cov_s_kh %*% inv_cov_kh_kh %*% cov_kh_s
-  if (det(cov_soft) <= 0) {cov_soft <- cov_s_s}
+  if (det(cov_soft) <= 0) cov_soft <- cov_s_s
 
   for (i in 1:n) {
+
     ###########################################################################
     #      zk, zkh values
     ###########################################################################
 
     zk <- zk_vec[i]
     zk_h <- c(zk, zh)
-
 
     ###########################################################################
     #   Part B: compute density of zk
@@ -163,14 +189,20 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
       sigma = cov_soft
     )[1]
 
-    if (f_soft == 0) {f_soft <- 1e-4}
-    if (aa == 0) {aa <- 1e-4}
+    if (f_soft == 0) f_soft <- 1e-4
+    if (aa == 0) aa <- 1e-4
 
     pk[i] <- round(((1 / aa) * f_zk * f_soft), 5)
   }
 
-  d <- data.frame(zki = zk_vec, f_zki = pk)
+  d <- data.frame("zk_i" = zk_vec, "prob_zk_i" = pk)
   df <- d[!rowSums(is.na(d)), ]
+
+  # Plot if requested
+  if (plot) {
+    plot(df$zk_i, df$prob_zk_i, type = "l", xlab = "z", ylab = "f(z)",
+         main = "posterior density")
+  }
 
   return(df)
 }

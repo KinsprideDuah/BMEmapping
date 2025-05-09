@@ -23,7 +23,8 @@
 #   variance and mode estimates
 # ============================================================================
 bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                         nsmax, nhmax) {
+                         nsmax = 5, nhmax = 5, n = 50,
+                         zk_range = range(zh, a, b, -2, 2)) {
 
   x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
@@ -32,8 +33,8 @@ bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   df <- matrix(NA, ncol = 3, nrow = nk)
 
   for (i in 1:nk) {
-    d <- prob_zk(x[i, ], ch, cs, zh, a, b, model, nugget, sill, range,
-                 nsmax, nhmax)
+    d <- prob_zk(x[i,], ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
+                 nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2))
 
     delta <- d[2, 1] - d[1, 1]
 
@@ -47,7 +48,7 @@ bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
     zk_mode <- d[which.max(d[, 2]), 1]
 
     # gather estimates
-    df[i, ] <- c(zk_mode, zk_mean, zk_var)
+    df[i, ] <- round(c(zk_mode, zk_mean, zk_var), 4)
   }
 
   return(df)

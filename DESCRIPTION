@@ -13,7 +13,9 @@ Description:
     of heterogeneous data sources including both hard data (precise 
     measurements) and soft interval data (bounded or uncertain observations) 
     while incorporating prior knowledge and supporting variogram-based spatial 
-    modeling. 
+    modeling. The BME methodology is described in Christakos (1990) 
+    <https::link.springer.com/article/10.1007/BF00890661> and Serre (1999) 
+    <https::mserre.sph.unc.edu/docFile/MarcSerre_WholeDissertation.pdf>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -22,13 +24,11 @@ BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
-    ggplot2,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    stats,
     mvtnorm
 Depends: 
     R (>= 3.5)

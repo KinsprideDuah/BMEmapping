@@ -1,16 +1,16 @@
 # testing the covariance matrix function
 
 # data
-data("utah")
-
-c1 <- data.matrix(utah[1:3, c("x", "y")])
-c2 <- data.matrix(utah[4:5, c("x", "y")])
+data("utsnowload")
+c1 <- data.matrix(utsnowload[1:3, c("latitude", "longitude")])
+c2 <- data.matrix(utsnowload[4:5, c("latitude", "longitude")])
 
 # variogram model and parameters
-model <- "sph"
-nugget <- 0.1184
-sill <- 0.3474
-range <- 119197
+model <- "exp"
+nugget <- 0.0953
+sill <- 0.3639
+range <- 1.0787
+
 
 # test for exponential models
 test_that("covariance matrix function works for exponential models", {

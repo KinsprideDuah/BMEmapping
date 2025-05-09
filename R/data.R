@@ -3,7 +3,8 @@
 #' A subset of data from the 7964 measurement locations included in the 2020
 #' National Snow Load Study. This data is basically on reliability-targeted
 #' snow loads (RTSL) in the state of California.
-#'
+#' @name casnowload
+#' @docType data
 #' @format A data frame with 346 rows and 8 columns.
 #'
 #' \describe{
@@ -20,26 +21,31 @@
 #'               measurements have LOWER < RTSL < UPPER.}
 #' }
 #' @source \url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
-"california"
+"casnowload"
 
-#' A projected hard and soft-interval design ground snow load dataset for Utah.
+
+
+#' A detrended reliability-targeted design ground snow loads in Utah
 #'
-#' A dataset comprising 65 hard data points and 167 soft-interval data,
-#' used in the analysis by Duah et al. (2025). The dataset includes 232
-#' measurement locations, which are derived from the 2020 National Snow Load
-#' Study (Bean et al., 2021). For a comprehensive understanding of the dataset
-#' and its usage, please refer to Duah et al. (2025).
-#'
-#' @format A data frame with 232 rows and 7 variables:
+#' This dataset contains detrended reliability-targeted design ground snow load
+#' measurements from 232 locations in state of Utah. Of these, 65 sites report
+#' precise measurements, treated as hard data, while the remaining 167 sites
+#' report imprecise measurements, represented as interval (soft) data. The
+#' dataset is structured such that the first 67 rows contain hard (point)
+#' measurements, and the remaining rows represent soft data using lower and
+#' upper interval bounds. For a detailed explanation of the dataset and its use,
+#' refer to the related version described in Duah et al. (2025)
+#' <https://doi.org/10.1016/j.spasta.2025.100894>.
+#' @name utahsnowload
+#' @docType data
+#' @format A data frame with 232 rows and 5 variables:
 #'
 #'  \describe{
 #'  \item{latitude}{Latitude coordinate position}
 #'  \item{longitude}{Longitude coordinate position}
-#'  \item{x}{Projected latitude coordinate}
-#'  \item{y}{Projected longitude coordinate}
-#'  \item{center}{The hard data value}
+#'  \item{hard}{The hard data value}
 #'  \item{lower}{The lower endpoint of the soft-interval}
 #'  \item{upper}{The upper endpoint of the soft-interval}
 #'  }
-#' @source \url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
-"utah"
+#' @source \url{https://doi.org/10.1016/j.spasta.2025.100894}
+"utsnowload"

@@ -2,78 +2,84 @@
 % Please edit documentation in R/bme_predict.R
 \name{bme_predict}
 \alias{bme_predict}
-\title{bme_predict function}
+\title{Bayesian Maximum Entropy (BME) Spatial Interpolation}
 \usage{
-bme_predict(
-  x,
-  ch,
-  cs,
-  zh,
-  a,
-  b,
-  model,
-  nugget,
-  sill,
-  range,
-  nsmax,
-  nhmax,
-  type
-)
+bme_predict(x, ch, cs, zh, a, b,
+            model, nugget, sill, range, nsmax = 5,
+            nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+            type)
 }
 \arguments{
-\item{x}{matrix of estimation locations}
+\item{x}{A two-column matrix of spatial coordinates for the estimation
+locations.}
 
-\item{ch}{matrix of hard data locations}
+\item{ch}{A two-column matrix of spatial coordinates for hard data locations.}
 
-\item{cs}{matrix of soft data locations}
+\item{cs}{A two-column matrix of spatial coordinates for soft (interval) data
+locations.}
 
-\item{zh}{vector of hard data}
+\item{zh}{A numeric vector of observed values at the hard data locations.}
 
-\item{a}{vector of lower bounds of soft data}
+\item{a}{A numeric vector of lower bounds for the soft interval data.}
 
-\item{b}{vector of lower bounds of soft data}
+\item{b}{A numeric vector of upper bounds for the soft interval data.}
 
-\item{model}{string name of covariance or variogram model}
+\item{model}{A string specifying the variogram or covariance model to use
+(e.g., \code{"exp"}, \code{"sph"}, etc.).}
 
-\item{nugget}{a value}
+\item{nugget}{A non-negative numeric value for the nugget effect in the
+variogram model.}
 
-\item{sill}{a value}
+\item{sill}{A numeric value representing the sill (total variance) in the
+variogram model.}
 
-\item{range}{a non-negative value}
+\item{range}{A positive numeric value for the range (or effective range)
+parameter of the variogram model.}
 
-\item{nsmax}{number of soft data locations closer to the estimation location}
+\item{nsmax}{An integer specifying the maximum number of nearby soft data
+points to include for estimation (default is 5).}
 
-\item{nhmax}{number of hard data locations closer to the estimation location}
+\item{nhmax}{An integer specifying the maximum number of nearby hard data
+points to include for estimation (default is 5).}
 
-\item{type}{a string specifying the preferred prediction type: either "mean"
-for the posterior mean or "mode" for the posterior mode.}
+\item{n}{An integer indicating the number of points at which to evaluate the
+posterior density over \code{zk_range} (default is 50).}
+
+\item{zk_range}{A numeric vector specifying the range over which to evaluate
+the unobserved value at the estimation location (\code{zk}). Although
+\code{zk} is unknown,  it is assumed to lie within a range similar to
+the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
+to explore the posterior distribution at a few locations using
+\code{prob_zk()} before finalizing this range. The default is
+\code{c(min(zh, a, -2), max(zh, b, 2)}.}
+
+\item{type}{A string indicating the type of BME prediction to compute: either
+\code{"mean"} for the posterior mean or \code{"mode"} for the
+posterior mode.}
 }
 \value{
-Data frame of estimation locations with their corresponding BME
-predictions
+A data frame with four columns: the first two contain the geographic
+coordinates, the third provides the BME prediction (posterior mean
+or mode), and the fourth gives the associated posterior variance.
 }
 \description{
-bme_predict function
-}
-\details{
-Compute the BME predictions for estimation locations.
+\code{bme_predict} performs BME spatial interpolation at user-specified
+estimation locations. It uses both hard data (precise measurements) and soft
+data (interval or uncertain measurements), along with a specified variogram
+model, to compute either the posterior mean or mode and associated variance
+for each location. This function enables spatial prediction in settings where
+uncertainty in data must be explicitly accounted for, improving estimation
+accuracy when soft data is available.
 }
 \examples{
-data("utah")
-x <- data.matrix(utah[1, c("x", "y")])
-ch <- data.matrix(utah[2:67, c("x", "y")])
-cs <- data.matrix(utah[68:232, c("x", "y")])
-zh <- c(utah[2:67, c("center")])
-a <- c(utah[68:232, c("lower")])
-b <- c(utah[68:232, c("upper")])
-model <- "sph"
-nugget <- 0.1184
-sill <- 0.3474
-range <- 119197
-nsmax <- 5
-nhmax <- 10
-type <- "mean"
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax,
-            type)
+data("utsnowload")
+x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
+ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
+cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
+zh <- c(utsnowload[2:67, c("hard")])
+a <- c(utsnowload[68:232, c("lower")])
+b <- c(utsnowload[68:232, c("upper")])
+bme_predict(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953,
+            sill = 0.3639, range = 1.0787, type = "mean")
 
 }

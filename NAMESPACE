@@ -2,7 +2,5 @@
 
 export(bme_cv)
 export(bme_predict)
-export(posterior_plot)
 export(prob_zk)
-export(sim_cholesky)
 import(mvtnorm)

@@ -2,59 +2,87 @@
 % Please edit documentation in R/prob_zk.R
 \name{prob_zk}
 \alias{prob_zk}
-\title{Posterior density function}
+\title{Posterior Density Estimation at a Single Location}
 \usage{
-prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5, nhmax = 5)
+prob_zk(x, ch, cs, zh, a, b,
+        model, nugget, sill, range, nsmax = 5,
+        nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+        plot = FALSE)
 }
 \arguments{
-\item{x}{matrix of estimation locations. Cannot exceed 1 locations}
+\item{x}{A two-column matrix of spatial coordinates for a single estimation
+location.}
 
-\item{ch}{matrix of hard data locations}
+\item{ch}{A two-column matrix of spatial coordinates for hard data locations.}
 
-\item{cs}{matrix of soft data locations}
+\item{cs}{A two-column matrix of spatial coordinates for soft (interval) data
+locations.}
 
-\item{zh}{vector of hard data}
+\item{zh}{A numeric vector of observed values at the hard data locations.}
 
-\item{a}{vector of lower bounds of soft data}
+\item{a}{A numeric vector of lower bounds for the soft interval data.}
 
-\item{b}{vector of lower bounds of soft data}
+\item{b}{A numeric vector of upper bounds for the soft interval data.}
 
-\item{model}{string name of covariance or variogram model}
+\item{model}{A string specifying the variogram or covariance model to use
+(e.g., \code{"exp"}, \code{"sph"}, etc.).}
 
-\item{nugget}{a value}
+\item{nugget}{A non-negative numeric value for the nugget effect in the
+variogram model.}
 
-\item{sill}{a value}
+\item{sill}{A numeric value representing the sill (total variance) in the
+variogram model.}
 
-\item{range}{a non-negative value}
+\item{range}{A positive numeric value for the range (or effective range)
+parameter of the variogram model.}
 
-\item{nsmax}{number of soft data locations closer to the estimation location}
+\item{nsmax}{An integer specifying the maximum number of nearby soft data
+points to include for estimation (default is 5).}
 
-\item{nhmax}{number of hard data locations closer to the estimation location}
+\item{nhmax}{An integer specifying the maximum number of nearby hard data
+points to include for estimation (default is 5).}
+
+\item{n}{An integer indicating the number of points at which to evaluate the
+posterior density over \code{zk_range}.}
+
+\item{zk_range}{A numeric vector specifying the range over which to evaluate
+the unobserved value at the estimation location (\code{zk}). Although
+\code{zk} is unknown,  it is assumed to lie within a range similar to
+the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
+to explore the posterior distribution at a few locations using
+\code{prob_zk()} before finalizing this range. The default is
+\code{c(min(zh, a, -2), max(zh, b, 2)}.}
+
+\item{plot}{Logical; if \code{TRUE}, plots the posterior density curve.}
 }
 \value{
-A two column matrix of zk and associated probabilities.
+Two elements:
+\describe{
+\item{\emph{data frame}}{A data frame with two columns: \code{zk_i}
+(assumed zk values) and \code{prob_zk_i} (corresponding posterior
+densities).}
+\item{\emph{plot}}{An optional plot of posterior density of the estimation
+location.}
+}
 }
 \description{
-Posterior density function
-}
-\details{
-Computes the numerical estimation of the posterior density of a
-single unobserved location.
+Computes the posterior and plots probability density function (PDF) at a
+single unobserved spatial location using the Bayesian Maximum Entropy (BME)
+framework. This function integrates both hard data (precise measurements) and
+soft data (interval or uncertain observations), together with a specified
+variogram model, to numerically estimate the posterior density across a
+range of possible values. Optionally displays a plot of the posterior density
+function for the specified location.
 }
 \examples{
-data("utah")
-x <- data.matrix(utah[1, c("x", "y")])
-ch <- data.matrix(utah[2:67, c("x", "y")])
-cs <- data.matrix(utah[68:232, c("x", "y")])
-zh <- c(utah[2:67, c("center")])
-a <- c(utah[68:232, c("lower")])
-b <- c(utah[68:232, c("upper")])
-model <- "sph"
-nugget <- 0.1184
-sill <- 0.3474
-range <- 119197
-nsmax <- 5
-nhmax <- 5
-prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+data("utsnowload")
+x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
+ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
+cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
+zh <- utsnowload[2:67, "hard"]
+a <- utsnowload[68:232, "lower"]
+b <- utsnowload[68:232, "upper"]
+prob_zk(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953, sill = 0.3639,
+        range = 1.0787, plot = TRUE)
 
 }

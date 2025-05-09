@@ -24,11 +24,6 @@ Specifically, **BMEmapping** is designed to perform spatial interpolation at uno
 
 To begin, load the package with:
 
-```{r echo=FALSE, warning=FALSE}
-library(ggplot2)
-```
-
-
 ```{r setup}
 library(BMEmapping)
 ```
@@ -38,32 +33,30 @@ library(BMEmapping)
 
 The main functions available in **BMEmapping** include:
 
-`prob_zk` - computes the numerical estimation of the posterior density of an unobserved location.
+`prob_zk` - computes and optionally plots the posterior density estimate at a single unobserved location.
 
-`posterior_plot` - plots the the posterior density of an unobserved location.
-
-`bme_predict` - predicts the posterior mean/mode and variance of an unobserved location.
+`bme_predict` - predicts the posterior mean or mode and the associated variance at an unobserved location.
 
 `bme_cv` - performs a cross-validation on the hard data to assess model performance.
-
-`sim_cholesky` - simulates multiple independent sets of zero-mean Gaussian.
 
 
 $~$
 
 ## A Data Example
 
-To introduce the functionality of **BMEmapping**, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utah` data that is part of the package and can be accessed by the command
+To introduce the functionality of **BMEmapping**, we will look at a modeling problem for estimating reliability-targeted snow loads in the state of Utah. The `utsnowload` data that is part of the package and can be accessed by the command
 
 ```{r}
-data("utah")
-head(utah)
+data("utsnowload")
+head(utsnowload)
 ```
 
-and the documentation of the `utah` data can be found by invoking the command:
+The variables `latitude` and `longitude` represent the geographic coordinates of each location. The variable `hard` contains the values of precise (hard) data measurements, while `lower` and `upper` define the bounds of the soft interval data. 
+
+Complete documentation for the `utsnowload` dataset can be accessed using the command 
 
 ```{r eval=FALSE}
-?utah
+?utsnowload
 ```
 
   
@@ -71,7 +64,7 @@ and the documentation of the `utah` data can be found by invoking the command:
 
 The **BMEmapping** functions require the following input arguments:
 
-`x`: A vector specifying the geographic location(s) where predictions are to be made.
+`x`: A matrix specifying the geographic location(s) where predictions are to be made.
 
 `ch`: A matrix or data frame containing the geographic coordinates of the hard data locations.
 
@@ -103,67 +96,71 @@ A recommended tool for variogram modeling is the **gstat** package, which provid
 
 * `nsmax`: Maximum number of nearby soft-interval data points to include in the integration process.
 
-If these parameters are not specified, the function uses default values: `nhmax` = 10 and `nsmax` = 5. This means the integration step will automatically select the 10 nearest hard data points and the 5 nearest soft data points relative to each prediction location.
+* `zk_range`: A numeric vector specifying the range over which to evaluate the unobserved value at the estimation location.
 
+* `n`: An integer indicating the number of points at which to evaluate the posterior density over `zk_range`.
+
+The optional parameters are set to their default values. For further details, refer to the function documentation (e.g., ?`prob_zk`).
 
 ### BME Prediction
 
-Using the `utah` dataset, you can prepare the necessary input variables as shown below. In this example, we designate **Location 1** as the **prediction location**.
+Using the `utsnowload` dataset, you can prepare the necessary input variables as shown below. In this example, we designate **Locations 1 to 5** as the **prediction locations**.
 
 ```{r}
 # prediction location
-x <- data.matrix(utah[1, c("x", "y")])
+x <- data.matrix(utsnowload[1:5, c("latitude", "longitude")])
+x
+```
 
+The hard and soft-interval data are assigned as
+
+```{r}
 # hard data locations
-ch <- data.matrix(utah[2:20, c("x", "y")]) 
+ch <- data.matrix(utsnowload[6:20, c("latitude", "longitude")]) 
 
 # soft data locations
-cs <- data.matrix(utah[68:232, c("x", "y")])  
+cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])  
 
 # hard data values
-zh <- c(utah[2:20, c("center")])
+zh <- c(utsnowload[6:20, c("hard")])
 
 # lower bounds
-a <- c(utah[68:232, c("lower")]) 
+a <- c(utsnowload[68:232, c("lower")]) 
 
 # upper bounds
-b <- c(utah[68:232, c("upper")]) 
-
-# variogram model and parameters
-model <- "sph"
-nugget <- 0.1184
-sill <- 0.3474
-range <- 119197
-
-# additional parameters
-nsmax <- 5
-nhmax <- 5
+b <- c(utsnowload[68:232, c("upper")]) 
 
 ```
 
 
-The `prob_zk` function accepts all the data and variogram input arguments explained above. The numerical estimation of the posterior density for location `x = (lat = 394835.1, lon = 4477333)` is computed as 
+The variogram model and parameters are given as:
+
 ```{r}
-zk <- prob_zk(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
-
-#show first 10 rows 
-head(zk, 10)
+# variogram model and parameters
+model <- "exp"
+nugget <- 0.0953
+sill <- 0.3639
+range <- 1.0787
 ```
 
-The `posterior_plot` function accepts the same arguments as the `prob_zk` function. The posterior density for location `x = (lat = 394835.1, lon = 4477333)` can be shown by
 
-```{r fig.width = 6, fig.height = 4, fig.align='center'}
-posterior_plot(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax)
+
+The `prob_zk` function accepts all the data and variogram input arguments explained above. The numerical estimation of the posterior density for prediction location is computed as
+
+```{r fig.width = 6, fig.height = 6, fig.align='center'}
+prob_zk(x[1,], ch, cs, zh, a, b, model, nugget, sill, range, n = 20, plot = TRUE)
 ```
 
-The `bme_predict` function accepts the same arguments as the `prob_zk` function, with the addition of a `type` argument, which specifies the preferred type of prediction (either the posterior mean or mode). Using the data provided, we can predict the mean and mode of the posterior density at the location `x = (lat = 394835.1, lon = 4477333)` by:
+The plot of the posterior density becomes smoother as the value of `n` increases.
+
+The `bme_predict` function accepts the same arguments as the `prob_zk` function, with the addition of a `type` argument, which specifies the preferred type of prediction (either the posterior mean or mode). Using the data provided, we can predict the mean and mode of the posterior density at the prediction location location by:
 
 ```{r}
 # posterior mode
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mode")
+bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, type = "mode")
 
 # posterior mean
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mean")
+bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
 ```
 
 
@@ -175,25 +172,10 @@ The `bme_cv` function performs LOOCV for at hard data locations and returns key 
 
 Functionally, `bme_cv` accepts similar arguments as the `bme_predict` function. Given the necessary data inputs and variogram parameters, LOOCV can be applied to evaluate the posterior mean predictions as follows:
 
-```{r eval=T}
-bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, nsmax, nhmax, type = "mean")
+```{r}
+bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
 
 ```
 
 
-### Spatial Data Simulation
-
-Spatial data simulation using the *Cholesky decomposition* of the covariance matrix is a reliable method for generating spatially correlated Gaussian data. It is particularly effective for producing a set of zero-mean, multivariate normal values that conform to a specified spatial covariance structure. This technique is most practical when working with a small number of hard data points (typically fewer than a few hundred), where the computational cost of decomposing the full covariance matrix remains manageable.
-
-Given a set of spatial locations, `x` and a specified variogram model with its associated parameters (`model`, `nugget`, `sill`, `range`), the `sim_cholesky` function generates zero-mean Gaussian values at those locations that respect the defined spatial covariance structure.
-
-```{r warning=FALSE}
-x <- matrix(runif(10), ncol = 2)
-model <- "sph"
-nugget <- 0
-sill <- 1
-range <- 1
-
-sim_cholesky(x, model, nugget, sill, range)
-```
 
