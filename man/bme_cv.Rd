@@ -57,9 +57,9 @@ posterior mode.}
 \value{
 A list with two elements:
 \describe{
-\item{\code{results}}{A data frame containing coordinates, observed values,
-BME predictions (\code{mean} or \code{mode}), posterior variance, residuals,
-and fold index.}
+\item{\code{results}}{A data frame containing the coordinates, observed
+values, BME predictions (posterior \code{mean} or \code{mode}), posterior
+variance (if \code{type = "mean"}), residuals, and fold indices.}
 \item{\code{metrics}}{A one-row data frame reporting the mean error (ME),
 mean absolute error (MAE), and root mean squared error (RMSE) from the
 cross-validation.}

@@ -21,27 +21,28 @@
 # - A covariance matrix with same size as D
 # ============================================================================
 covmat <- function(c1, c2, model, nugget, sill, range) {
+
+  # Input checks
   if (nugget < 0) {
-    stop("Error: nugget cannot be negative. Execution stopped.")
+    stop("`nugget` must be non-negative.")
+  }
+  if (sill <= 0) {
+    stop("`sill` must be positive.")
+  }
+  if (range <= 0) {
+    stop("`range` must be positive.")
   }
 
-  if (sill <= 0 || range <= 0) {
-    stop("Error: Neither the sill nor range can be negative. Execution stopped.")
-  }
-
+  # Compute pairwise distances
   d <- distant(c1, c2)
 
-  if (model == "sph") {
-    k <- spherical(d, nugget, sill, range)
-  } else if (model == "exp") {
-    k <- exponential(d, nugget, sill, range)
-  } else if (model == "gau") {
-    k <- gausian(d, nugget, sill, range)
-  } else {
-    k <- c("Error: The variogram/covariance model is incorrect. Execution stopped.")
-  }
-
-  #k[d > dmax] <- 0
+  # Select model
+  model <- tolower(model)
+  k <- switch(model,
+              sph = spherical(d, nugget, sill, range),
+              exp = exponential(d, nugget, sill, range),
+              gau = gausian(d, nugget, sill, range),
+              stop("Invalid model type. Choose from 'sph', 'exp', or 'gau'."))
 
   return(round(k, 6))
 }

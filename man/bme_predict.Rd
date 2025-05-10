@@ -58,9 +58,12 @@ to explore the posterior distribution at a few locations using
 posterior mode.}
 }
 \value{
-A data frame with four columns: the first two contain the geographic
-coordinates, the third provides the BME prediction (posterior mean
-or mode), and the fourth gives the associated posterior variance.
+A data frame with either 3 or 4 columns, depending on the prediction
+type. The first two columns contain the geographic coordinates. If
+\code{type = "mean"}, the third and fourth columns represent the
+posterior mean and its associated variance, respectively. If
+\code{type = "mode"}, only a third column is returned for the
+posterior mode.
 }
 \description{
 \code{bme_predict} performs BME spatial interpolation at user-specified

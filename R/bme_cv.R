@@ -26,9 +26,9 @@
 #'
 #' @returns A list with two elements:
 #' \describe{
-#'   \item{\code{results}}{A data frame containing coordinates, observed values,
-#'   BME predictions (\code{mean} or \code{mode}), posterior variance, residuals,
-#'   and fold index.}
+#'   \item{\code{results}}{A data frame containing the coordinates, observed
+#'   values, BME predictions (posterior \code{mean} or \code{mode}), posterior
+#'   variance (if \code{type = "mean"}), residuals, and fold indices.}
 #'   \item{\code{metrics}}{A one-row data frame reporting the mean error (ME),
 #'   mean absolute error (MAE), and root mean squared error (RMSE) from the
 #'   cross-validation.}
@@ -85,11 +85,11 @@ bme_cv <- function(ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
                    nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
                    type) {
   type <- match.arg(type, choices = c("mean", "mode"))
-  col_idx <- if (type == "mode") c(1, 3) else c(2, 3)
-  col_names <- c(type, "variance")
+  col_idx <- if (type == "mode") 1 else c(2, 3)
+  col_names <- if (type == "mode") "mode" else c("mean", "variance")
 
   nh <- nrow(ch)
-  est <- matrix(NA, nrow = nh, ncol = 2)
+  est <- matrix(NA, nrow = nh, ncol = length(col_idx))
 
   for (i in seq_len(nh)) {
     est[i, ] <- bme_estimate(
@@ -100,16 +100,9 @@ bme_cv <- function(ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
     )[, col_idx]
   }
 
-  result <- data.frame(
-    coord.1 = ch[, 1],
-    coord.2 = ch[, 2],
-    observed = zh,
-    prediction = est[, 1],
-    variance = est[, 2],
-    residual = round(zh - est[, 1], 4),
-    fold = seq_len(nh)
-  )
-  names(result)[4:5] <- col_names
+  ch_names <- if (is.null(colnames(ch))) c("coord.1", "coord.2") else colnames(ch)
+  result <- cbind.data.frame(ch, zh, est, round(zh - est[, 1], 4), seq_len(nh))
+  names(result) <- c(ch_names, "observed", col_names, "residual", "fold")
 
   metrics <- with(result, {
     c(

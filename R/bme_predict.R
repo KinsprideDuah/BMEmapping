@@ -47,9 +47,12 @@
 #'        \code{"mean"} for the posterior mean or \code{"mode"} for the
 #'        posterior mode.
 #'
-#' @returns A data frame with four columns: the first two contain the geographic
-#'          coordinates, the third provides the BME prediction (posterior mean
-#'          or mode), and the fourth gives the associated posterior variance.
+#' @returns A data frame with either 3 or 4 columns, depending on the prediction
+#'          type. The first two columns contain the geographic coordinates. If
+#'          \code{type = "mean"}, the third and fourth columns represent the
+#'          posterior mean and its associated variance, respectively. If
+#'          \code{type = "mode"}, only a third column is returned for the
+#'          posterior mode.
 #'
 #' @import mvtnorm
 #'
@@ -71,18 +74,17 @@ bme_predict <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
 
   type <- match.arg(type, choices = c("mean", "mode"))
 
-  cols <- c(if (type == "mode") 1 else 2, 3)
-  names <- c(if (type == "mode") "mode" else "mean", "variance")
+  cols <- if (type == "mode") 1 else c(2, 3)
+  est_names <- if (type == "mode") "mode" else c("mean", "variance")
 
   est <- bme_estimate(x, ch, cs, zh, a, b, model, nugget, sill, range,
                       nsmax, nhmax, n, zk_range)[, cols]
-  est <- matrix(est, ncol = 2)
+  est <- matrix(est, ncol = length(cols))
 
-  result <- data.frame(coord.1 = x[, 1],
-                       coord.2 = x[, 2],
-                       est1 = est[, 1],
-                       est1 = est[, 2])
-  names(result)[3:4] <- names
+  x_names <- if (is.null(colnames(x))) c("coord.1", "coord.2") else colnames(x)
+
+  result <- cbind.data.frame(x, est)
+  names(result) <- c(x_names, est_names)
 
   return(result)
 }
