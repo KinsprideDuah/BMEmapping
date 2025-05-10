@@ -1,3 +1,5 @@
+# BMEmapping 0.3.0
+
 # BMEmapping 0.2.0
 
 <<<<<<< HEAD

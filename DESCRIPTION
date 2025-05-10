@@ -1,7 +1,7 @@
 Package: BMEmapping
 Type: Package
 Title: Spatial Interpolation using Bayesian Maximum Entropy (BME)
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
     person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
     role = c("aut", "cre", "cph"), comment = c(ORCID = "0009-0004-3990-7985")),
@@ -14,8 +14,8 @@ Description:
     measurements) and soft interval data (bounded or uncertain observations) 
     while incorporating prior knowledge and supporting variogram-based spatial 
     modeling. The BME methodology is described in Christakos (1990) 
-    <https::link.springer.com/article/10.1007/BF00890661> and Serre (1999) 
-    <https::mserre.sph.unc.edu/docFile/MarcSerre_WholeDissertation.pdf>.
+    <doi:10.1007/BF00890661> and Serre and Christakos (1999) 
+    <doi:10.1007/s004770050029>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

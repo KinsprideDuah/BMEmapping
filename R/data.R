@@ -35,7 +35,7 @@
 #' measurements, and the remaining rows represent soft data using lower and
 #' upper interval bounds. For a detailed explanation of the dataset and its use,
 #' refer to the related version described in Duah et al. (2025)
-#' <https://doi.org/10.1016/j.spasta.2025.100894>.
+#' <doi:10.1016/j.spasta.2025.100894>
 #' @name utahsnowload
 #' @docType data
 #' @format A data frame with 232 rows and 5 variables:
@@ -47,5 +47,5 @@
 #'  \item{lower}{The lower endpoint of the soft-interval}
 #'  \item{upper}{The upper endpoint of the soft-interval}
 #'  }
-#' @source \url{https://doi.org/10.1016/j.spasta.2025.100894}
+#' @source \doi{10.1016/j.spasta.2025.100894}
 "utsnowload"
