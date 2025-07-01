@@ -82,7 +82,7 @@
 #'
 #' @export
 bme_cv <- function(ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
-                   nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+                   nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
                    type) {
   type <- match.arg(type, choices = c("mean", "mode"))
   col_idx <- if (type == "mode") 1 else c(2, 3)

@@ -108,7 +108,7 @@ Using the `utsnowload` dataset, you can prepare the necessary input variables as
 
 ```{r}
 # prediction location
-x <- data.matrix(utsnowload[228:232, c("latitude", "longitude")])
+x <- utsnowload[228:232, c("latitude", "longitude")]
 x
 ```
 
@@ -116,19 +116,19 @@ The hard and soft-interval data are assigned as
 
 ```{r}
 # hard data locations
-ch <- data.matrix(utsnowload[1:67, c("latitude", "longitude")]) 
+ch <- utsnowload[1:67, c("latitude", "longitude")] 
 
 # soft data locations
-cs <- data.matrix(utsnowload[68:227, c("latitude", "longitude")])  
+cs <- utsnowload[68:227, c("latitude", "longitude")]  
 
 # hard data values
-zh <- c(utsnowload[1:67, c("hard")])
+zh <- utsnowload[1:67, c("hard")]
 
 # lower bounds
-a <- c(utsnowload[68:227, c("lower")]) 
+a <- utsnowload[68:227, c("lower")] 
 
 # upper bounds
-b <- c(utsnowload[68:227, c("upper")]) 
+b <- utsnowload[68:227, c("upper")] 
 
 ```
 
@@ -148,7 +148,7 @@ range <- 1.0787
 The `prob_zk` function accepts all the data and variogram input arguments explained above. The numerical estimation of the posterior density for prediction location is computed as
 
 ```{r fig.width = 4, fig.height = 4.5, fig.align='center'}
-prob_zk(x[1,], ch, cs, zh, a, b, model, nugget, sill, range, plot = TRUE)
+prob_zk(x[1,], ch, cs, zh, a, b, model, nugget, sill, range,  plot = TRUE)
 ```
 
 The plot of the posterior density becomes smoother as the value of `n` increases.

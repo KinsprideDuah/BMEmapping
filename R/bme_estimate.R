@@ -24,7 +24,13 @@
 # ============================================================================
 bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
                          nsmax = 5, nhmax = 5, n = 50,
-                         zk_range = range(zh, a, b, -2, 2)) {
+                         zk_range = extended_range(zh, a, b)) {
+  if (is.data.frame(x)) x <- as.matrix(x)
+  if (is.data.frame(ch)) ch <- as.matrix(ch)
+  if (is.data.frame(cs)) cs <- as.matrix(cs)
+  if (is.data.frame(zh) && ncol(zh) == 1) zh <- zh[[1]]
+  if (is.data.frame(a) && ncol(c) == 1) a <- a[[1]]
+  if (is.data.frame(b) && ncol(a) == 1) b <- b[[1]]
 
   x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
@@ -33,8 +39,11 @@ bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   df <- matrix(NA, ncol = 3, nrow = nk)
 
   for (i in 1:nk) {
-    d <- prob_zk(x[i,], ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
-                 nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2))
+    d <- prob_zk(
+      x = x[i, ], ch = ch, cs = cs, zh = zh, a = a, b = b,
+      model = model, nugget = nugget, sill = sill, range = range,
+      nsmax = nsmax, nhmax = nhmax, n = n, zk_range = zk_range
+    )
 
     delta <- d[2, 1] - d[1, 1]
 

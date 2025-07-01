@@ -54,8 +54,6 @@
 #'          \code{type = "mode"}, only a third column is returned for the
 #'          posterior mode.
 #'
-#' @import mvtnorm
-#'
 #' @examples
 #' data("utsnowload")
 #' x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
@@ -64,21 +62,25 @@
 #' zh <- c(utsnowload[2:67, c("hard")])
 #' a <- c(utsnowload[68:232, c("lower")])
 #' b <- c(utsnowload[68:232, c("upper")])
-#' bme_predict(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953,
-#'             sill = 0.3639, range = 1.0787, type = "mean")
+#' bme_predict(x, ch, cs, zh, a, b,
+#'   model = "exp", nugget = 0.0953,
+#'   sill = 0.3639, range = 1.0787, type = "mean"
+#' )
 #'
 #' @export
 bme_predict <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
                         nsmax = 5, nhmax = 5, n = 50,
                         zk_range = range(zh, a, b, -2, 2), type) {
-
   type <- match.arg(type, choices = c("mean", "mode"))
 
   cols <- if (type == "mode") 1 else c(2, 3)
   est_names <- if (type == "mode") "mode" else c("mean", "variance")
 
-  est <- bme_estimate(x, ch, cs, zh, a, b, model, nugget, sill, range,
-                      nsmax, nhmax, n, zk_range)[, cols]
+  est <- bme_estimate(
+    x = x, ch = ch, cs = cs, zh = zh, a = a, b = b,
+    model = model, nugget = nugget, sill = sill, range = range,
+    nsmax = nsmax, nhmax = nhmax, n = n, zk_range = zk_range
+  )[, cols]
   est <- matrix(est, ncol = length(cols))
 
   x_names <- if (is.null(colnames(x))) c("coord.1", "coord.2") else colnames(x)

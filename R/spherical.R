@@ -17,7 +17,7 @@ spherical <- function(dmatrix, nugget, sill, range) {
   # Calculate the spherical covariance
   cov <- sill * (1 - ((3 / 2) * (dmatrix / range) - (1 / 2) *
                         (dmatrix / range)^3))
-  diag(cov) <- diag(cov) + nugget
+  #diag(cov) <- diag(cov) + nugget
 
   return(cov)
 }

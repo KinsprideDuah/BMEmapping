@@ -22,17 +22,6 @@
 # ============================================================================
 covmat <- function(c1, c2, model, nugget, sill, range) {
 
-  # Input checks
-  if (nugget < 0) {
-    stop("`nugget` must be non-negative.")
-  }
-  if (sill <= 0) {
-    stop("`sill` must be positive.")
-  }
-  if (range <= 0) {
-    stop("`range` must be positive.")
-  }
-
   # Compute pairwise distances
   d <- distant(c1, c2)
 
@@ -44,5 +33,7 @@ covmat <- function(c1, c2, model, nugget, sill, range) {
               gau = gausian(d, nugget, sill, range),
               stop("Invalid model type. Choose from 'sph', 'exp', or 'gau'."))
 
-  return(round(k, 6))
+  if (identical(c1, c2)) diag(k) <- diag(k) + nugget
+
+  return(round(k, 4))
 }

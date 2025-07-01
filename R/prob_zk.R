@@ -69,7 +69,7 @@
 #'
 #' @export
 prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
-                    nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+                    nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
                     plot = FALSE) {
 
   check_x(x, cs, ch)
@@ -77,6 +77,13 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
   check_matrix_or_dataframe(cs, "cs")
   check_vectors(zh, a, b)
   check_lengths(ch, zh, cs, a, b)
+
+  if (is.data.frame(x)) x <- as.matrix(x)
+  if (is.data.frame(ch)) ch <- as.matrix(ch)
+  if (is.data.frame(cs)) cs <- as.matrix(cs)
+  if (is.data.frame(zh) && ncol(zh) == 1) zh <- zh[[1]]
+  if (is.data.frame(a) && ncol(c) == 1) a <- a[[1]]
+  if (is.data.frame(b) && ncol(a) == 1) b <- b[[1]]
 
   x <- matrix(x, ncol = 2)
 
@@ -133,7 +140,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
 
   # covariance matrix
   cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
-  if (det(cov_a) <= 0) cov_a <- cov_s_s
+  #if (det(cov_a) <= 0) cov_a <- cov_s_s
 
   # mean vector
   mu_a <- c(cov_s_h %*% inv_cov_hs_hs %*% zh)
@@ -154,7 +161,7 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
   # conditional variance
   inv_cov_kh_kh <- solve(cov_kh_kh)
   cov_soft <- cov_s_s - cov_s_kh %*% inv_cov_kh_kh %*% cov_kh_s
-  if (det(cov_soft) <= 0) cov_soft <- cov_s_s
+  #if (det(cov_soft) <= 0) cov_soft <- cov_s_s
 
   for (i in 1:n) {
 
@@ -189,8 +196,8 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
       sigma = cov_soft
     )[1]
 
-    if (f_soft == 0) f_soft <- 1e-4
-    if (aa == 0) aa <- 1e-4
+    #if (f_soft == 0) f_soft <- 1e-4
+    #if (aa == 0) aa <- 1e-4
 
     pk[i] <- round(((1 / aa) * f_zk * f_soft), 5)
   }

@@ -3,4 +3,3 @@
 export(bme_cv)
 export(bme_predict)
 export(prob_zk)
-import(mvtnorm)

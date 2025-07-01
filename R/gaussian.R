@@ -16,7 +16,7 @@
 gausian <- function(dmatrix, nugget, sill, range) {
   # Calculate the Gaussian covariance
   cov <- sill * exp(-(dmatrix / range)^2)
-  diag(cov) <- diag(cov) + nugget
+  #diag(cov) <- diag(cov) + nugget
 
   # Set values to 0 where distances exceed the range
   cov[dmatrix > range] <- 0

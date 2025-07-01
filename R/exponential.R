@@ -16,7 +16,7 @@
 exponential <- function(dmatrix, nugget, sill, range) {
   # Calculate the exponential covariance
   cov <- sill * exp(-3 * dmatrix / range)
-  diag(cov) <- diag(cov) + nugget
+  #diag(cov) <- diag(cov) + nugget
 
   return(cov)
 }
