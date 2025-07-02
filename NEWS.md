@@ -1,3 +1,5 @@
+# BMEmapping 1.0.0
+
 # BMEmapping 0.3.0
 
 ## Major Features
