@@ -14,35 +14,9 @@
 # - A distance matrix between two sets of locations
 # ============================================================================
 distant <- function(c1, c2) {
-  if (length(c1) == 2) {
-    c1 <- matrix(c1, ncol = 2)
-  } else {
-    c1 <- c1
-  }
-
-  if (length(c2) == 2) {
-    c2 <- matrix(c2, ncol = 2)
-  } else {
-    c2 <- c2
-  }
-
-  n1 <- nrow(c1) # Number of rows in c1
-  n2 <- nrow(c2) # Number of rows in c2
-
-  unit1 <- matrix(1, n1, 1) # Column vector of ones with n1 rows
-  unit2 <- matrix(1, n2, 1) # Column vector of ones with n2 rows
-
-  # Calculate the Kronecker product
-  d <- kronecker(unit2, c1) - kronecker(c2, unit1)
-
-  # Conditional to handle the size of D
-  if (ncol(d) == 1) {
-    d <- abs(d)
-  } else {
-    d <- sqrt(rowSums(d^2)) # Equivalent to sqrt(sum((D.^2)')')
-  }
-
-  d <- matrix(d, nrow = n1, ncol = n2) # Reshape D to n1 x n2
+  d_x <- outer(c1[, 1], c2[, 1], "-")
+  d_y <- outer(c1[, 2], c2[, 2], "-")
+  d <- sqrt(d_x^2 + d_y^2)
 
   return(round(d, 4))
 }

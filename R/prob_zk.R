@@ -20,7 +20,7 @@
 #'
 #' @usage prob_zk(x, ch, cs, zh, a, b,
 #'         model, nugget, sill, range, nsmax = 5,
-#'         nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+#'         nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
 #'         plot = FALSE)
 #'
 #' @param x A two-column matrix of spatial coordinates for a single estimation
@@ -51,16 +51,16 @@
 #'        the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 #'        to explore the posterior distribution at a few locations using
 #'        \code{prob_zk()} before finalizing this range. The default is
-#'        \code{c(min(zh, a, -2), max(zh, b, 2)}.
+#'        \code{extended_range(zh, a, b)}.
 #' @param n An integer indicating the number of points at which to evaluate the
 #'        posterior density over \code{zk_range}.
 #' @param plot Logical; if \code{TRUE}, plots the posterior density curve.
 #'
 #' @examples
 #' data("utsnowload")
-#' x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
-#' ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
-#' cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
+#' x <- utsnowload[1, c("latitude", "longitude")]
+#' ch <- utsnowload[2:67, c("latitude", "longitude")]
+#' cs <- utsnowload[68:232, c("latitude", "longitude")]
 #' zh <- utsnowload[2:67, "hard"]
 #' a <- utsnowload[68:232, "lower"]
 #' b <- utsnowload[68:232, "upper"]
@@ -78,14 +78,12 @@ prob_zk <- function(x, ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
   check_vectors(zh, a, b)
   check_lengths(ch, zh, cs, a, b)
 
-  if (is.data.frame(x)) x <- as.matrix(x)
-  if (is.data.frame(ch)) ch <- as.matrix(ch)
-  if (is.data.frame(cs)) cs <- as.matrix(cs)
-  if (is.data.frame(zh) && ncol(zh) == 1) zh <- zh[[1]]
-  if (is.data.frame(a) && ncol(c) == 1) a <- a[[1]]
-  if (is.data.frame(b) && ncol(a) == 1) b <- b[[1]]
-
-  x <- matrix(x, ncol = 2)
+  x  <- clean_input(x)
+  ch <- clean_input(ch)
+  cs <- clean_input(cs)
+  zh <- clean_input(zh)
+  a  <- clean_input(a)
+  b  <- clean_input(b)
 
   if (nrow(x) != 1) {
     stop("Can only compute the mapping set for a single location")

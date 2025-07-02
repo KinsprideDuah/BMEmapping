@@ -1,5 +1,24 @@
 # BMEmapping 0.3.0
 
+## Major Features
+
+* Extended the zk-range by 20%. This accommodation provides better estimates. 
+
+* Updated the functions to compute the covariance matrices to better refelect 
+the impact of a nugget.
+
+## Minor Features
+
+* Updated the structure of data
+
+* Updated checks on data
+
+* Eliminated Kronecker products in distant computation.
+
+# BMEmapping 0.3.0
+
+* Improved error messaging and minor fixes
+
 # BMEmapping 0.2.0
 
 <<<<<<< HEAD

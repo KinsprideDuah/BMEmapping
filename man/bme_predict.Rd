@@ -6,7 +6,7 @@
 \usage{
 bme_predict(x, ch, cs, zh, a, b,
             model, nugget, sill, range, nsmax = 5,
-            nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+            nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
             type)
 }
 \arguments{
@@ -51,7 +51,7 @@ the unobserved value at the estimation location (\code{zk}). Although
 the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 to explore the posterior distribution at a few locations using
 \code{prob_zk()} before finalizing this range. The default is
-\code{c(min(zh, a, -2), max(zh, b, 2)}.}
+\code{extended_range(zh, a, b)}.}
 
 \item{type}{A string indicating the type of BME prediction to compute: either
 \code{"mean"} for the posterior mean or \code{"mode"} for the
@@ -76,13 +76,15 @@ accuracy when soft data is available.
 }
 \examples{
 data("utsnowload")
-x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
-ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
-cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
-zh <- c(utsnowload[2:67, c("hard")])
-a <- c(utsnowload[68:232, c("lower")])
-b <- c(utsnowload[68:232, c("upper")])
-bme_predict(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953,
-            sill = 0.3639, range = 1.0787, type = "mean")
+x <- utsnowload[1, c("latitude", "longitude")]
+ch <- utsnowload[2:67, c("latitude", "longitude")]
+cs <- utsnowload[68:232, c("latitude", "longitude")]
+zh <- utsnowload[2:67, c("hard")]
+a <- utsnowload[68:232, c("lower")]
+b <- utsnowload[68:232, c("upper")]
+bme_predict(x, ch, cs, zh, a, b,
+  model = "exp", nugget = 0.0953,
+  sill = 0.3639, range = 1.0787, type = "mean"
+)
 
 }

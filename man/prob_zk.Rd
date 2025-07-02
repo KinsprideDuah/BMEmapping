@@ -6,7 +6,7 @@
 \usage{
 prob_zk(x, ch, cs, zh, a, b,
         model, nugget, sill, range, nsmax = 5,
-        nhmax = 5, n = 50, zk_range = range(zh, a, b, -2, 2),
+        nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
         plot = FALSE)
 }
 \arguments{
@@ -51,7 +51,7 @@ the unobserved value at the estimation location (\code{zk}). Although
 the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 to explore the posterior distribution at a few locations using
 \code{prob_zk()} before finalizing this range. The default is
-\code{c(min(zh, a, -2), max(zh, b, 2)}.}
+\code{extended_range(zh, a, b)}.}
 
 \item{plot}{Logical; if \code{TRUE}, plots the posterior density curve.}
 }
@@ -76,9 +76,9 @@ function for the specified location.
 }
 \examples{
 data("utsnowload")
-x <- data.matrix(utsnowload[1, c("latitude", "longitude")])
-ch <- data.matrix(utsnowload[2:67, c("latitude", "longitude")])
-cs <- data.matrix(utsnowload[68:232, c("latitude", "longitude")])
+x <- utsnowload[1, c("latitude", "longitude")]
+ch <- utsnowload[2:67, c("latitude", "longitude")]
+cs <- utsnowload[68:232, c("latitude", "longitude")]
 zh <- utsnowload[2:67, "hard"]
 a <- utsnowload[68:232, "lower"]
 b <- utsnowload[68:232, "upper"]

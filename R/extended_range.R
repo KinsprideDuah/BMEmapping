@@ -12,10 +12,10 @@
 # Outputs:
 # - A two-length vector containing the extended minimum and maximum value
 # ============================================================================
-
-extended_range <- function(x, y, z) {
+#' @keywords internal
+extended_range <- function(zh, a, b) {
   # Combine vectors
-  combined <- c(x, y, z)
+  combined <- c(zh, a, b)
 
   # Compute min and max
   min_val <- min(combined, na.rm = TRUE)

@@ -25,14 +25,7 @@
 bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
                          nsmax = 5, nhmax = 5, n = 50,
                          zk_range = extended_range(zh, a, b)) {
-  if (is.data.frame(x)) x <- as.matrix(x)
-  if (is.data.frame(ch)) ch <- as.matrix(ch)
-  if (is.data.frame(cs)) cs <- as.matrix(cs)
-  if (is.data.frame(zh) && ncol(zh) == 1) zh <- zh[[1]]
-  if (is.data.frame(a) && ncol(c) == 1) a <- a[[1]]
-  if (is.data.frame(b) && ncol(a) == 1) b <- b[[1]]
-
-  x <- matrix(c(x), ncol = 2)
+  #x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
 
   # set up container for estimates: mean, variance, mode
