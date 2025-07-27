@@ -13,8 +13,11 @@
 # - A two-length vector containing the extended minimum and maximum value
 # ============================================================================
 #' @keywords internal
-extended_range <- function(zh, a, b) {
+extended_range <- function(x) {
   # Combine vectors
+  zh <- data_object$zh
+  a  <- data_object$a
+  b  <- data_object$b
   combined <- c(zh, a, b)
 
   # Compute min and max

@@ -1,50 +1,10 @@
 #' @title Leave-one-out cross validation (LOOCV) at hard data locations.
 #'
-#' @description
-#' \code{bme_cv} performs LOOCV to evaluate the prediction performance
-#' of the Bayesian Maximum Entropy (BME) spatial interpolation method using both
-#' hard and soft (interval) data.
+#' @usage bme_cv(data_object, model, nugget, sill, range,
+#'               nsmax = 5, nhmax = 5, n = 50,
+#'               zk_range = extended_range(data_object), type)
 #'
-#' For each hard data location, the function removes the observed value and
-#' predicts it using all remaining hard and soft data points. This is repeated
-#' for every hard data location. The predictions are either posterior means or
-#' posterior modes, depending on the \code{type} argument.
-#'
-#' The function returns prediction results at each location, including the
-#' residuals (differences between observed and predicted values), and
-#' computes three performance metrics:
-#' \itemize{
-#'   \item \strong{ME (Mean Error)} – measures prediction bias.
-#'   \item \strong{MAE (Mean Absolute Error)} – measures average magnitude of
-#'   prediction error.
-#'   \item \strong{RMSE (Root Mean Squared Error)} – emphasizes larger errors
-#'   and reflects prediction accuracy.
-#' }
-#'
-#' This function is useful for validating the BME interpolation method and
-#' tuning variogram parameters.
-#'
-#' @returns A list with two elements:
-#' \describe{
-#'   \item{\code{results}}{A data frame containing the coordinates, observed
-#'   values, BME predictions (posterior \code{mean} or \code{mode}), posterior
-#'   variance (if \code{type = "mean"}), residuals, and fold indices.}
-#'   \item{\code{metrics}}{A one-row data frame reporting the mean error (ME),
-#'   mean absolute error (MAE), and root mean squared error (RMSE) from the
-#'   cross-validation.}
-#' }
-#'
-#' @usage bme_cv(ch, cs, zh, a, b,
-#'        model, nugget, sill, range, nsmax = 5,
-#'        nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
-#'        type)
-#'
-#' @param ch A matrix of spatial coordinates for hard data locations
-#'        (each row is a location).
-#' @param cs A matrix of spatial coordinates for soft (interval) data locations.
-#' @param zh A numeric vector of observed values at the hard data locations.
-#' @param a A numeric vector of lower bounds for the soft interval data.
-#' @param b A numeric vector of upper bounds for the soft interval data.
+#' @param data_object A list containing the hard and soft data.
 #' @param model A string specifying the variogram or covariance model to use
 #'        (e.g., \code{"exp"}, \code{"sph"}, etc.).
 #' @param nugget A non-negative numeric value for the nugget effect in the
@@ -64,11 +24,27 @@
 #'        \code{zk} is unknown,  it is assumed to lie within a range similar to
 #'        the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 #'        to explore the posterior distribution at a few locations using
-#'        \code{prob_zk()} before finalizing this range. The default is
-#'        \code{extended_range(zh, a, b)}.
+#'        \code{prob_zk()} before finalizing this range.
 #' @param type A string indicating the type of BME prediction to compute: either
 #'        \code{"mean"} for the posterior mean or \code{"mode"} for the
 #'        posterior mode.
+#'
+#' @returns A data frame containing the coordinates, observed
+#'          values, BME predictions (posterior \code{mean} or \code{mode}),
+#'          posterior variance (if \code{type = "mean"}), residuals, and fold
+#'          indices.
+#'
+#' @description
+#' \code{bme_cv} performs LOOCV to evaluate the prediction performance
+#' of the Bayesian Maximum Entropy (BME) spatial interpolation method using both
+#' hard and soft (interval) data. For each hard data location, the function
+#' removes the observed value and predicts it using all remaining hard and soft
+#' data points. This is repeated for every hard data location. The predictions
+#' are either posterior means or posterior modes, depending on the \code{type}
+#' argument.
+#'
+#' This function is useful for validating the BME interpolation method and
+#' tuning variogram parameters.
 #'
 #' @examples
 #' data("utsnowload")
@@ -77,23 +53,36 @@
 #' zh <- utsnowload[2:10, c("hard")]
 #' a <- utsnowload[68:232, c("lower")]
 #' b <- utsnowload[68:232, c("upper")]
-#' bme_cv(ch, cs, zh, a, b, model = "exp", nugget = 0.0953, sill = 0.3639,
+#' data_object <- bme_map(ch, cs, zh, a , b)
+#' bme_cv(data_object, model = "exp", nugget = 0.0953, sill = 0.3639,
 #'        range = 1.0787, type = "mean")
 #'
 #' @export
-bme_cv <- function(ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
-                   nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
+bme_cv <- function(data_object, model, nugget, sill, range, nsmax = 5,
+                   nhmax = 5, n = 50, zk_range = extended_range(data_object),
                    type) {
   type <- match.arg(type, choices = c("mean", "mode"))
   col_idx <- if (type == "mode") 1 else c(2, 3)
   col_names <- if (type == "mode") "mode" else c("mean", "variance")
 
+  ch <- as.data.frame(data_object$ch)
+  cs <- as.data.frame(data_object$cs)
+  zh <- data_object$zh
+  a  <- data_object$a
+  b  <- data_object$b
+
   nh <- nrow(ch)
   est <- matrix(NA, nrow = nh, ncol = length(col_idx))
 
   for (i in seq_len(nh)) {
+    data_obj <- bme_map(ch = ch[-i, ],
+                        cs = cs,
+                        zh = zh[-i],
+                        a = a,
+                        b = b)
+
     est[i, ] <- bme_estimate(
-      x = ch[i, ], ch = ch[-i, ], cs = cs, zh = zh[-i], a = a, b = b,
+      x = ch[i,], data_object = data_obj,
       model = model, nugget = nugget, sill = sill, range = range,
       nsmax = nsmax, nhmax = nhmax, n = n,
       zk_range = zk_range
@@ -104,14 +93,7 @@ bme_cv <- function(ch, cs, zh, a, b, model, nugget, sill, range, nsmax = 5,
   result <- cbind.data.frame(ch, zh, est, round(zh - est[, 1], 4), seq_len(nh))
   names(result) <- c(ch_names, "observed", col_names, "residual", "fold")
 
-  metrics <- with(result, {
-    c(
-      ME = round(mean(residual), 4),
-      MAE = round(mean(abs(residual)), 4),
-      RMSE = round(sqrt(mean(residual^2)), 4)
-    )
-  })
+  return(structure(result, class = c("BMEmapping", "data.frame")))
 
-  return(list(results = result, metrics = as.data.frame(t(metrics))))
 }
 

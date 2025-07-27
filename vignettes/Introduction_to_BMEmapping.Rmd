@@ -33,6 +33,8 @@ library(BMEmapping)
 
 The main functions available in **BMEmapping** include:
 
+`bme_map` - creates a `BMEmapping` object that contains all the data information necessary for BME interpolation.
+
 `prob_zk` - computes and optionally plots the posterior density estimate at a single unobserved location.
 
 `bme_predict` - predicts the posterior mean or mode and the associated variance at an unobserved location.
@@ -129,7 +131,17 @@ a <- utsnowload[68:227, c("lower")]
 
 # upper bounds
 b <- utsnowload[68:227, c("upper")] 
+```
 
+The data for the mapping is created by
+```{r}
+# create a data object 
+data_object <- bme_map(ch, cs, zh, a , b)
+```
+
+The spatial plot of the data is given as
+```{r ig.width = 6, fig.height = 6, fig.align='center'}
+plot(data_object)
 ```
 
 
@@ -144,11 +156,13 @@ range <- 1.0787
 ```
 
 
-
 The `prob_zk` function accepts all the data and variogram input arguments explained above. The numerical estimation of the posterior density for prediction location is computed as
 
 ```{r fig.width = 4, fig.height = 4.5, fig.align='center'}
-prob_zk(x[1,], ch, cs, zh, a, b, model, nugget, sill, range,  plot = TRUE)
+df <- prob_zk(x[1,], data_object, model, nugget, sill, range)
+head(df)
+
+plot(df)
 ```
 
 The plot of the posterior density becomes smoother as the value of `n` increases.
@@ -157,12 +171,11 @@ The `bme_predict` function accepts the same arguments as the `prob_zk` function,
 
 ```{r}
 # posterior mode
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, type = "mode")
-
+bme_predict(x, data_object, model, nugget, sill, range, type = "mode")
+ 
 # posterior mean
-bme_predict(x, ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
+bme_predict(x, data_object, model, nugget, sill, range, type = "mean")
 ```
-
 
 ### Leave-One-Out Cross-Validation (LOOCV) for Model Evaluation
 
@@ -173,7 +186,7 @@ The `bme_cv` function performs LOOCV for at hard data locations and returns key 
 Functionally, `bme_cv` accepts similar arguments as the `bme_predict` function. Given the necessary data inputs and variogram parameters, LOOCV can be applied to evaluate the posterior mean predictions as follows:
 
 ```{r eval=FALSE}
-bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
+bme_cv(data_object, model, nugget, sill, range, type = "mean")
 
 #> $results
 #>    latitude longitude    observed    mean variance residual fold
@@ -244,10 +257,6 @@ bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
 #> 65    37.53   -113.05 -0.07280592 -0.3232   0.2927   0.2504   65
 #> 66    38.48   -109.27 -0.90950964 -0.3653   0.3869  -0.5442   66
 #> 67    37.81   -109.49 -0.39635792 -0.3522   0.3680  -0.0442   67
-#> 
-#> $metrics
-#> ME    MAE   RMSE
-#> 1 -0.0102 0.2378 0.2953
 ```
 
 

@@ -22,9 +22,9 @@
 # - A data frame of estimation locations with their corresponding bme mean,
 #   variance and mode estimates
 # ============================================================================
-bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
+bme_estimate <- function(x, data_object, model, nugget, sill, range,
                          nsmax = 5, nhmax = 5, n = 50,
-                         zk_range = extended_range(zh, a, b)) {
+                         zk_range = extended_range(data_object)) {
   #x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
 
@@ -33,7 +33,7 @@ bme_estimate <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
 
   for (i in 1:nk) {
     d <- prob_zk(
-      x = x[i, ], ch = ch, cs = cs, zh = zh, a = a, b = b,
+      x = x[i, ], data_object = data_object,
       model = model, nugget = nugget, sill = sill, range = range,
       nsmax = nsmax, nhmax = nhmax, n = n, zk_range = zk_range
     )

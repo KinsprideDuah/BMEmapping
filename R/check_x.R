@@ -16,3 +16,15 @@ check_x <- function(x, ch, cs) {
   }
 }
 
+check_xx <- function(x) {
+  if (is.vector(x) && length(x) == 2) {
+    return(invisible(TRUE))
+  }
+
+  if ((is.matrix(x) || is.data.frame(x)) &&
+      nrow(x) == 1 && ncol(x) == 2) {
+    return(invisible(TRUE))
+  }
+
+  stop("Input `x` must be either a vector of length 2 or a matrix/data.frame with 1 row and 2 columns.", call. = FALSE)
+}

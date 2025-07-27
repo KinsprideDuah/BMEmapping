@@ -6,7 +6,7 @@
 numeric vectors: x, y, z. The range is extended by 10\\% of the original
 range on both sides}
 \usage{
-extended_range(zh, a, b)
+extended_range(x)
 }
 \description{
 Computes an extended numeric range that includes all elements from three

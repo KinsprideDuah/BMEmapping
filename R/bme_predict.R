@@ -1,27 +1,12 @@
 #' @title Bayesian Maximum Entropy (BME) Spatial Interpolation
 #'
-#' @description
-#' \code{bme_predict} performs BME spatial interpolation at user-specified
-#' estimation locations. It uses both hard data (precise measurements) and soft
-#' data (interval or uncertain measurements), along with a specified variogram
-#' model, to compute either the posterior mean or mode and associated variance
-#' for each location. This function enables spatial prediction in settings where
-#' uncertainty in data must be explicitly accounted for, improving estimation
-#' accuracy when soft data is available.
-#'
-#' @usage bme_predict(x, ch, cs, zh, a, b,
-#'             model, nugget, sill, range, nsmax = 5,
-#'             nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
-#'             type)
+#' @usage bme_predict(x, data_object, model, nugget, sill, range,
+#'                    nsmax = 5, nhmax = 5, n = 50,
+#'                    zk_range = extended_range(data_object), type)
 #'
 #' @param x A two-column matrix of spatial coordinates for the estimation
 #'        locations.
-#' @param ch A two-column matrix of spatial coordinates for hard data locations.
-#' @param cs A two-column matrix of spatial coordinates for soft (interval) data
-#'        locations.
-#' @param zh A numeric vector of observed values at the hard data locations.
-#' @param a A numeric vector of lower bounds for the soft interval data.
-#' @param b A numeric vector of upper bounds for the soft interval data.
+#' @param data_object A list containing the hard and soft data.
 #' @param model A string specifying the variogram or covariance model to use
 #'        (e.g., \code{"exp"}, \code{"sph"}, etc.).
 #' @param nugget A non-negative numeric value for the nugget effect in the
@@ -41,8 +26,7 @@
 #'        \code{zk} is unknown,  it is assumed to lie within a range similar to
 #'        the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 #'        to explore the posterior distribution at a few locations using
-#'        \code{prob_zk()} before finalizing this range. The default is
-#'        \code{extended_range(zh, a, b)}.
+#'        \code{prob_zk()} before finalizing this range.
 #' @param type A string indicating the type of BME prediction to compute: either
 #'        \code{"mean"} for the posterior mean or \code{"mode"} for the
 #'        posterior mode.
@@ -54,6 +38,15 @@
 #'          \code{type = "mode"}, only a third column is returned for the
 #'          posterior mode.
 #'
+#' @description
+#' \code{bme_predict} performs BME spatial interpolation at user-specified
+#' estimation locations. It uses both hard data (precise measurements) and soft
+#' data (interval or uncertain measurements), along with a specified variogram
+#' model, to compute either the posterior mean or mode and associated variance
+#' for each location. This function enables spatial prediction in settings where
+#' uncertainty in data must be explicitly accounted for, improving estimation
+#' accuracy when soft data is available.
+#'
 #' @examples
 #' data("utsnowload")
 #' x <- utsnowload[1, c("latitude", "longitude")]
@@ -62,22 +55,23 @@
 #' zh <- utsnowload[2:67, c("hard")]
 #' a <- utsnowload[68:232, c("lower")]
 #' b <- utsnowload[68:232, c("upper")]
-#' bme_predict(x, ch, cs, zh, a, b,
+#' data_object <- bme_map(ch, cs, zh, a , b)
+#' bme_predict(x, data_object,
 #'   model = "exp", nugget = 0.0953,
 #'   sill = 0.3639, range = 1.0787, type = "mean"
 #' )
 #'
 #' @export
-bme_predict <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
+bme_predict <- function(x, data_object, model, nugget, sill, range,
                         nsmax = 5, nhmax = 5, n = 50,
-                        zk_range = extended_range(zh, a, b), type) {
+                        zk_range = extended_range(data_object), type) {
   type <- match.arg(type, choices = c("mean", "mode"))
 
   cols <- if (type == "mode") 1 else c(2, 3)
   est_names <- if (type == "mode") "mode" else c("mean", "variance")
 
   est <- bme_estimate(
-    x = x, ch = ch, cs = cs, zh = zh, a = a, b = b,
+    x = x, data_object = data_object,
     model = model, nugget = nugget, sill = sill, range = range,
     nsmax = nsmax, nhmax = nhmax, n = n, zk_range = zk_range
   )[, cols]
@@ -88,5 +82,21 @@ bme_predict <- function(x, ch, cs, zh, a, b, model, nugget, sill, range,
   result <- cbind.data.frame(x, est)
   names(result) <- c(x_names, est_names)
 
-  return(result)
+  return(structure(result, class = c("BMEmapping", "data.frame")))
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

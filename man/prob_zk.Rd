@@ -4,25 +4,15 @@
 \alias{prob_zk}
 \title{Posterior Density Estimation at a Single Location}
 \usage{
-prob_zk(x, ch, cs, zh, a, b,
-        model, nugget, sill, range, nsmax = 5,
-        nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
-        plot = FALSE)
+prob_zk(x, data_object, model, nugget, sill, range,
+               nsmax = 5, nhmax = 5, n = 50,
+               zk_range = extended_range(data_object))
 }
 \arguments{
 \item{x}{A two-column matrix of spatial coordinates for a single estimation
 location.}
 
-\item{ch}{A two-column matrix of spatial coordinates for hard data locations.}
-
-\item{cs}{A two-column matrix of spatial coordinates for soft (interval) data
-locations.}
-
-\item{zh}{A numeric vector of observed values at the hard data locations.}
-
-\item{a}{A numeric vector of lower bounds for the soft interval data.}
-
-\item{b}{A numeric vector of upper bounds for the soft interval data.}
+\item{data_object}{A list containing the hard and soft data.}
 
 \item{model}{A string specifying the variogram or covariance model to use
 (e.g., \code{"exp"}, \code{"sph"}, etc.).}
@@ -43,27 +33,18 @@ points to include for estimation (default is 5).}
 points to include for estimation (default is 5).}
 
 \item{n}{An integer indicating the number of points at which to evaluate the
-posterior density over \code{zk_range}.}
+posterior density over \code{zk_range} (default is 50).}
 
 \item{zk_range}{A numeric vector specifying the range over which to evaluate
 the unobserved value at the estimation location (\code{zk}). Although
 \code{zk} is unknown,  it is assumed to lie within a range similar to
 the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 to explore the posterior distribution at a few locations using
-\code{prob_zk()} before finalizing this range. The default is
-\code{extended_range(zh, a, b)}.}
-
-\item{plot}{Logical; if \code{TRUE}, plots the posterior density curve.}
+\code{prob_zk()} before finalizing this range}
 }
 \value{
-Two elements:
-\describe{
-\item{\emph{data frame}}{A data frame with two columns: \code{zk_i}
-(assumed zk values) and \code{prob_zk_i} (corresponding posterior
-densities).}
-\item{\emph{plot}}{An optional plot of posterior density of the estimation
-location.}
-}
+A data frame with two columns: \code{zk_i} (assumed zk values) and
+\code{prob_zk_i} (corresponding posterior densities).
 }
 \description{
 Computes the posterior and plots probability density function (PDF) at a
@@ -71,8 +52,7 @@ single unobserved spatial location using the Bayesian Maximum Entropy (BME)
 framework. This function integrates both hard data (precise measurements) and
 soft data (interval or uncertain observations), together with a specified
 variogram model, to numerically estimate the posterior density across a
-range of possible values. Optionally displays a plot of the posterior density
-function for the specified location.
+range of possible values.
 }
 \examples{
 data("utsnowload")
@@ -82,7 +62,8 @@ cs <- utsnowload[68:232, c("latitude", "longitude")]
 zh <- utsnowload[2:67, "hard"]
 a <- utsnowload[68:232, "lower"]
 b <- utsnowload[68:232, "upper"]
-prob_zk(x, ch, cs, zh, a, b, model = "exp", nugget = 0.0953, sill = 0.3639,
-        range = 1.0787, plot = TRUE)
+data_object <- bme_map(ch, cs, zh, a , b)
+prob_zk(x, data_object, model = "exp",
+        nugget = 0.0953, sill = 0.3639, range = 1.0787)
 
 }

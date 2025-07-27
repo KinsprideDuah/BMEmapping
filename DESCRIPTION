@@ -29,7 +29,11 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    mvtnorm
+    ggplot2,
+    gridExtra,
+    mvtnorm,
+    stats,
+    utils
 Depends: 
     R (>= 3.5)
 VignetteBuilder: knitr

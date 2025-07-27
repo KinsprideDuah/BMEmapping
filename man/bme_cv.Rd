@@ -4,22 +4,12 @@
 \alias{bme_cv}
 \title{Leave-one-out cross validation (LOOCV) at hard data locations.}
 \usage{
-bme_cv(ch, cs, zh, a, b,
-       model, nugget, sill, range, nsmax = 5,
-       nhmax = 5, n = 50, zk_range = extended_range(zh, a, b),
-       type)
+bme_cv(data_object, model, nugget, sill, range,
+              nsmax = 5, nhmax = 5, n = 50,
+              zk_range = extended_range(data_object), type)
 }
 \arguments{
-\item{ch}{A matrix of spatial coordinates for hard data locations
-(each row is a location).}
-
-\item{cs}{A matrix of spatial coordinates for soft (interval) data locations.}
-
-\item{zh}{A numeric vector of observed values at the hard data locations.}
-
-\item{a}{A numeric vector of lower bounds for the soft interval data.}
-
-\item{b}{A numeric vector of upper bounds for the soft interval data.}
+\item{data_object}{A list containing the hard and soft data.}
 
 \item{model}{A string specifying the variogram or covariance model to use
 (e.g., \code{"exp"}, \code{"sph"}, etc.).}
@@ -47,44 +37,26 @@ the unobserved value at the estimation location (\code{zk}). Although
 \code{zk} is unknown,  it is assumed to lie within a range similar to
 the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 to explore the posterior distribution at a few locations using
-\code{prob_zk()} before finalizing this range. The default is
-\code{extended_range(zh, a, b)}.}
+\code{prob_zk()} before finalizing this range.}
 
 \item{type}{A string indicating the type of BME prediction to compute: either
 \code{"mean"} for the posterior mean or \code{"mode"} for the
 posterior mode.}
 }
 \value{
-A list with two elements:
-\describe{
-\item{\code{results}}{A data frame containing the coordinates, observed
-values, BME predictions (posterior \code{mean} or \code{mode}), posterior
-variance (if \code{type = "mean"}), residuals, and fold indices.}
-\item{\code{metrics}}{A one-row data frame reporting the mean error (ME),
-mean absolute error (MAE), and root mean squared error (RMSE) from the
-cross-validation.}
-}
+A data frame containing the coordinates, observed
+values, BME predictions (posterior \code{mean} or \code{mode}),
+posterior variance (if \code{type = "mean"}), residuals, and fold
+indices.
 }
 \description{
 \code{bme_cv} performs LOOCV to evaluate the prediction performance
 of the Bayesian Maximum Entropy (BME) spatial interpolation method using both
-hard and soft (interval) data.
-
-For each hard data location, the function removes the observed value and
-predicts it using all remaining hard and soft data points. This is repeated
-for every hard data location. The predictions are either posterior means or
-posterior modes, depending on the \code{type} argument.
-
-The function returns prediction results at each location, including the
-residuals (differences between observed and predicted values), and
-computes three performance metrics:
-\itemize{
-\item \strong{ME (Mean Error)} – measures prediction bias.
-\item \strong{MAE (Mean Absolute Error)} – measures average magnitude of
-prediction error.
-\item \strong{RMSE (Root Mean Squared Error)} – emphasizes larger errors
-and reflects prediction accuracy.
-}
+hard and soft (interval) data. For each hard data location, the function
+removes the observed value and predicts it using all remaining hard and soft
+data points. This is repeated for every hard data location. The predictions
+are either posterior means or posterior modes, depending on the \code{type}
+argument.
 
 This function is useful for validating the BME interpolation method and
 tuning variogram parameters.
@@ -96,7 +68,8 @@ cs <- utsnowload[68:232, c("latitude", "longitude")]
 zh <- utsnowload[2:10, c("hard")]
 a <- utsnowload[68:232, c("lower")]
 b <- utsnowload[68:232, c("upper")]
-bme_cv(ch, cs, zh, a, b, model = "exp", nugget = 0.0953, sill = 0.3639,
+data_object <- bme_map(ch, cs, zh, a , b)
+bme_cv(data_object, model = "exp", nugget = 0.0953, sill = 0.3639,
        range = 1.0787, type = "mean")
 
 }
