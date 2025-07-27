@@ -25,7 +25,8 @@ devtools::install_github("KinsprideDuah/BMEmapping")
 
 ## Functions
 
-`bme_map` - creates a `BMEmapping` object that contains all the data information necessary for BME interpolation.
+`bme_map` - creates a `BMEmapping` object that contains all the data
+information necessary for BME interpolation.
 
 `prob_zk` - computes and optionally plots the posterior density estimate
 at a single unobserved location.
