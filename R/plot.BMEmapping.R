@@ -48,7 +48,6 @@ plot.BMEmapping <- function(x, ...) {
                 size = 2) +
      ggplot2::scale_color_gradient(low = "blue", high = "red") +
      ggplot2::labs(
-       title = "Spatial Data",
        x = coord_names[1],
        y = coord_names[2],
        color = "Intervl width",
