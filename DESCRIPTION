@@ -1,7 +1,7 @@
 Package: BMEmapping
 Type: Package
 Title: Spatial Interpolation using Bayesian Maximum Entropy (BME)
-Version: 1.2.0.9000
+Version: 1.0.1
 Authors@R: c(
     person("Kinspride", "Duah", email = "kinspride2020@gmail.com", 
     role = c("aut", "cre", "cph"), comment = c(ORCID = "0009-0004-3990-7985")),
