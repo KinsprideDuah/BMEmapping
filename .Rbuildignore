@@ -7,4 +7,5 @@
 ^\.github$
 ^cran-comments\.md$
 ^.*\.log$
+^Random Quantile Covariance$
 ^CRAN-SUBMISSION$
