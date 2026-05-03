@@ -47,22 +47,23 @@
 #' zh <- utsnowload[2:67, "hard"]
 #' a <- utsnowload[68:232, "lower"]
 #' b <- utsnowload[68:232, "upper"]
-#' data_object <- bme_map(ch, cs, zh, a , b)
-#' prob_zk(x, data_object, model = "exp",
-#'         nugget = 0.0953, sill = 0.3639, range = 1.0787)
+#' data_object <- bme_map(ch, cs, zh, a, b)
+#' prob_zk(x, data_object,
+#'   model = "exp",
+#'   nugget = 0.0953, sill = 0.3639, range = 1.0787
+#' )
 #'
 #' @export
 prob_zk <- function(x, data_object, model, nugget, sill, range, nsmax = 5,
                     nhmax = 5, n = 50, zk_range = extended_range(data_object)) {
-
-  x  <- clean_input(x)
+  x <- clean_input(x)
   check_xx(x)
 
   ch <- data_object$ch
   cs <- data_object$cs
   zh <- data_object$zh
-  a  <- data_object$a
-  b  <- data_object$b
+  a <- data_object$a
+  b <- data_object$b
 
   if (nrow(x) != 1) {
     stop("Can only compute the mapping set for a single location")
@@ -117,7 +118,7 @@ prob_zk <- function(x, data_object, model, nugget, sill, range, nsmax = 5,
 
   # covariance matrix
   cov_a <- cov_s_s - cov_s_h %*% inv_cov_hs_hs %*% cov_h_s
-  #if (det(cov_a) <= 0) cov_a <- cov_s_s
+  # if (det(cov_a) <= 0) cov_a <- cov_s_s
 
   # mean vector
   mu_a <- c(cov_s_h %*% inv_cov_hs_hs %*% zh)
@@ -138,10 +139,9 @@ prob_zk <- function(x, data_object, model, nugget, sill, range, nsmax = 5,
   # conditional variance
   inv_cov_kh_kh <- solve(cov_kh_kh)
   cov_soft <- cov_s_s - cov_s_kh %*% inv_cov_kh_kh %*% cov_kh_s
-  #if (det(cov_soft) <= 0) cov_soft <- cov_s_s
+  # if (det(cov_soft) <= 0) cov_soft <- cov_s_s
 
   for (i in 1:n) {
-
     ###########################################################################
     #      zk, zkh values
     ###########################################################################
@@ -173,8 +173,8 @@ prob_zk <- function(x, data_object, model, nugget, sill, range, nsmax = 5,
       sigma = cov_soft
     )[1]
 
-    #if (f_soft == 0) f_soft <- 1e-4
-    #if (aa == 0) aa <- 1e-4
+    # if (f_soft == 0) f_soft <- 1e-4
+    # if (aa == 0) aa <- 1e-4
 
     pk[i] <- round(((1 / aa) * f_zk * f_soft), 5)
   }

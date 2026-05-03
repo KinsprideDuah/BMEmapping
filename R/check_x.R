@@ -6,7 +6,7 @@
 # ============================================================================
 check_x <- function(x, ch, cs) {
   if (!(is.vector(x) && length(x) == 2) && !(is.matrix(x) && ncol(x) == 2) &&
-      !(is.data.frame(x) && ncol(x) == 2)) {
+    !(is.data.frame(x) && ncol(x) == 2)) {
     stop("Error: x must be a vector of length 2, a 2-column matrix, or a 2-column data frame. Execution stopped.")
   }
 
@@ -22,7 +22,7 @@ check_xx <- function(x) {
   }
 
   if ((is.matrix(x) || is.data.frame(x)) &&
-      nrow(x) == 1 && ncol(x) == 2) {
+    nrow(x) == 1 && ncol(x) == 2) {
     return(invisible(TRUE))
   }
 

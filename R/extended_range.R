@@ -16,8 +16,8 @@
 extended_range <- function(x) {
   # Combine vectors
   zh <- x$zh
-  a  <- x$a
-  b  <- x$b
+  a <- x$a
+  b <- x$b
   combined <- c(zh, a, b)
 
   # Compute min and max

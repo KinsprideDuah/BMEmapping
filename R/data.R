@@ -24,7 +24,6 @@
 "casnowload"
 
 
-
 #' A detrended reliability-targeted design ground snow loads in Utah
 #'
 #' This dataset contains detrended reliability-targeted design ground snow load

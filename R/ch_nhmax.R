@@ -13,12 +13,11 @@
 # - A two column matrix of locations closest to the estimation location
 # ============================================================================
 ch_nhmax <- function(x, ch, nhmax) {
-
   if (nhmax > nrow(ch)) {
     stop("Error: The nhmax must not exceed the number of hard-data locations.")
   }
 
-  n <- nrow(ch)  # Number of rows in cs
+  n <- nrow(ch) # Number of rows in cs
   # Pre-allocate distance vector
   dist <- numeric(n)
 

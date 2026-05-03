@@ -1,4 +1,3 @@
-
 # ============================================================================
 # Wrapper to prob_zk function
 #
@@ -14,12 +13,11 @@
 # - A two column matrix of locations closest to the estimation location
 # ============================================================================
 cs_nsmax <- function(x, cs, nsmax) {
-
   if (nsmax > nrow(cs)) {
     stop("Error: The nsmax must not exceed the number of soft-data locations.")
   }
 
-  n <- nrow(cs)  # Number of rows in cs
+  n <- nrow(cs) # Number of rows in cs
   # Pre-allocate distance vector
   dist <- numeric(n)
 

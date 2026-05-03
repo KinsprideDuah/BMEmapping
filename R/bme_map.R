@@ -22,16 +22,15 @@
 #' a <- c(8, 9)
 #' b <- c(12, 14)
 #' obj <- bme_map(ch, cs, zh, a, b)
-#' class(obj)  # "BMEmapping"
+#' class(obj) # "BMEmapping"
 #'
 #' @export
 bme_map <- function(ch, cs, zh, a, b) {
-
   ch <- clean_input(ch)
   cs <- clean_input(cs)
   zh <- clean_input(zh)
-  a  <- clean_input(a)
-  b  <- clean_input(b)
+  a <- clean_input(a)
+  b <- clean_input(b)
 
   check_matrix_or_dataframe(ch, "ch")
   check_matrix_or_dataframe(cs, "cs")

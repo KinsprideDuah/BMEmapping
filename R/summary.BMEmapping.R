@@ -33,7 +33,6 @@ summary.BMEmapping <- function(object, ...) {
 
   # metrics
   metric_list <- list(
-
     # Mean Error (Bias)
     ME = mean(residual),
 
@@ -63,15 +62,11 @@ summary.BMEmapping <- function(object, ...) {
     cat(sprintf("%-10s %8.4f\n", metrics_df$Metric[i], metrics_df$Value[i]))
   }
 
-    metrics_df <- data.frame(
-      Metric = names(metric_list),
-      Value = unlist(metric_list),
-      row.names = NULL
-    )
+  metrics_df <- data.frame(
+    Metric = names(metric_list),
+    Value = unlist(metric_list),
+    row.names = NULL
+  )
 
   invisible(metrics_df)
 }
-
-
-
-

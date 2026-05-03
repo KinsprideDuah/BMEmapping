@@ -25,7 +25,7 @@
 bme_estimate <- function(x, data_object, model, nugget, sill, range,
                          nsmax = 5, nhmax = 5, n = 50,
                          zk_range = extended_range(data_object)) {
-  #x <- matrix(c(x), ncol = 2)
+  # x <- matrix(c(x), ncol = 2)
   nk <- nrow(x)
 
   # set up container for estimates: mean, variance, mode

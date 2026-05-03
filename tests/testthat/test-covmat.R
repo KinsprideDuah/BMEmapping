@@ -14,7 +14,6 @@ range <- 1.0787
 
 # test for exponential models
 test_that("covariance matrix function works for exponential models", {
-
   k_exp <- exponential(dmatrix = distant(c1, c2), nugget, sill, range)
 
   k_cov <- covmat(c1, c2, model = "exp", nugget, sill, range)
@@ -25,7 +24,6 @@ test_that("covariance matrix function works for exponential models", {
 
 # test for spherical models
 test_that("covariance matrix function works for spherical models", {
-
   k_sph <- spherical(dmatrix = distant(c1, c2), nugget, sill, range)
 
   k_cov <- covmat(c1, c2, model = "sph", nugget, sill, range)
@@ -36,7 +34,6 @@ test_that("covariance matrix function works for spherical models", {
 
 # test for Gaussian models
 test_that("covariance matrix function works for gaussian models", {
-
   k_gau <- gausian(dmatrix = distant(c1, c2), nugget, sill, range)
 
   k_cov <- covmat(c1, c2, model = "gau", nugget, sill, range)

@@ -55,7 +55,7 @@
 #' zh <- utsnowload[2:67, c("hard")]
 #' a <- utsnowload[68:232, c("lower")]
 #' b <- utsnowload[68:232, c("upper")]
-#' data_object <- bme_map(ch, cs, zh, a , b)
+#' data_object <- bme_map(ch, cs, zh, a, b)
 #' bme_predict(x, data_object,
 #'   model = "exp", nugget = 0.0953,
 #'   sill = 0.3639, range = 1.0787, type = "mean"
@@ -83,20 +83,4 @@ bme_predict <- function(x, data_object, model, nugget, sill, range,
   names(result) <- c(x_names, est_names)
 
   return(structure(result, class = c("BMEmapping", "data.frame")))
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

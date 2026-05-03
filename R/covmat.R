@@ -21,17 +21,17 @@
 # - A covariance matrix with same size as D
 # ============================================================================
 covmat <- function(c1, c2, model, nugget, sill, range) {
-
   # Compute pairwise distances
   d <- distant(c1, c2)
 
   # Select model
   model <- tolower(model)
   k <- switch(model,
-              sph = spherical(d, nugget, sill, range),
-              exp = exponential(d, nugget, sill, range),
-              gau = gausian(d, nugget, sill, range),
-              stop("Invalid model type. Choose from 'sph', 'exp', or 'gau'."))
+    sph = spherical(d, nugget, sill, range),
+    exp = exponential(d, nugget, sill, range),
+    gau = gausian(d, nugget, sill, range),
+    stop("Invalid model type. Choose from 'sph', 'exp', or 'gau'.")
+  )
 
   if (identical(c1, c2)) diag(k) <- diag(k) + nugget
 

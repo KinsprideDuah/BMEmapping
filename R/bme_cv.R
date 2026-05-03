@@ -53,9 +53,11 @@
 #' zh <- utsnowload[2:10, c("hard")]
 #' a <- utsnowload[68:232, c("lower")]
 #' b <- utsnowload[68:232, c("upper")]
-#' data_object <- bme_map(ch, cs, zh, a , b)
-#' bme_cv(data_object, model = "exp", nugget = 0.0953, sill = 0.3639,
-#'        range = 1.0787, type = "mean")
+#' data_object <- bme_map(ch, cs, zh, a, b)
+#' bme_cv(data_object,
+#'   model = "exp", nugget = 0.0953, sill = 0.3639,
+#'   range = 1.0787, type = "mean"
+#' )
 #'
 #' @export
 bme_cv <- function(data_object, model, nugget, sill, range, nsmax = 5,
@@ -68,21 +70,23 @@ bme_cv <- function(data_object, model, nugget, sill, range, nsmax = 5,
   ch <- as.data.frame(data_object$ch)
   cs <- as.data.frame(data_object$cs)
   zh <- data_object$zh
-  a  <- data_object$a
-  b  <- data_object$b
+  a <- data_object$a
+  b <- data_object$b
 
   nh <- nrow(ch)
   est <- matrix(NA, nrow = nh, ncol = length(col_idx))
 
   for (i in seq_len(nh)) {
-    data_obj <- bme_map(ch = ch[-i, ],
-                        cs = cs,
-                        zh = zh[-i],
-                        a = a,
-                        b = b)
+    data_obj <- bme_map(
+      ch = ch[-i, ],
+      cs = cs,
+      zh = zh[-i],
+      a = a,
+      b = b
+    )
 
     est[i, ] <- bme_estimate(
-      x = ch[i,], data_object = data_obj,
+      x = ch[i, ], data_object = data_obj,
       model = model, nugget = nugget, sill = sill, range = range,
       nsmax = nsmax, nhmax = nhmax, n = n,
       zk_range = zk_range
@@ -94,6 +98,4 @@ bme_cv <- function(data_object, model, nugget, sill, range, nsmax = 5,
   names(result) <- c(ch_names, "observed", col_names, "residual", "fold")
 
   return(structure(result, class = c("BMEmapping", "data.frame")))
-
 }
-
