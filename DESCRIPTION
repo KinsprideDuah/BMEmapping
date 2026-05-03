@@ -22,7 +22,7 @@ LazyData: true
 URL: https://github.com/KinsprideDuah/BMEmapping
 BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     knitr,
     rmarkdown,
@@ -31,6 +31,8 @@ Config/testthat/edition: 3
 Imports: 
     ggplot2,
     gridExtra,
+    gstat,
+    sf,
     mvtnorm,
     stats,
     utils

@@ -14,7 +14,8 @@
 # - A (qn + 2) by 3 data frame of variogram model and prameters. Each row
 #   represents the variogram model and prameters of each column.
 # ============================================================================
-
+#' @importFrom stats as.formula
+#'
 vg_results <- function(ch, cs, d) {
   # --- Combine coordinates ---
   coords <- rbind(as.matrix(ch), as.matrix(cs))
@@ -32,7 +33,7 @@ vg_results <- function(ch, cs, d) {
 
   for (i in seq_len(ncol(d))) {
     varname <- paste0("var", i)
-    form <- as.formula(paste(varname, "~ 1"))
+    form <- stats::as.formula(paste(varname, "~ 1"))
 
     # --- Empirical variogram ---
     vgm_emp <- gstat::variogram(form, data = sf_data)

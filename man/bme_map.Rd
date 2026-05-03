@@ -32,6 +32,6 @@ zh <- c(10, 20)
 a <- c(8, 9)
 b <- c(12, 14)
 obj <- bme_map(ch, cs, zh, a, b)
-class(obj)  # "BMEmapping"
+class(obj) # "BMEmapping"
 
 }

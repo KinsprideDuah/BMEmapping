@@ -1,20 +1,18 @@
 #' @title Leave-one-out cross validation (LOOCV) at hard data locations using
 #'        the random quantile approach.
 #'
-#' @usage q_bme_cv(data_object, nq = 3, nsmax = 5, nhmax = 5, n = 50,
+#' @usage q_bme_cv(data_object, nsmax = 5, nhmax = 5, n = 50, nq = 3,
 #'               zk_range = extended_range(data_object), type)
 #'
 #' @param data_object A list containing the hard and soft data.
-#' @param model A string specifying the variogram or covariance model to use
-#'        (e.g., \code{"exp"}, \code{"sph"}, etc.).
-#' @param nq A positive numeric value for the number of quantile levels
-#'        (default is 3).
 #' @param nsmax An integer specifying the maximum number of nearby soft data
 #'        points to include for estimation (default is 5).
 #' @param nhmax An integer specifying the maximum number of nearby hard data
 #'        points to include for estimation (default is 5).
 #' @param n An integer indicating the number of points at which to evaluate the
 #'        posterior density over \code{zk_range} (default is 50).
+#' @param nq A positive numeric value for the number of quantile levels
+#'        (default is 3).
 #' @param zk_range A numeric vector specifying the range over which to evaluate
 #'        the unobserved value at the estimation location (\code{zk}). Although
 #'        \code{zk} is unknown,  it is assumed to lie within a range similar to
@@ -53,8 +51,8 @@
 #' q_bme_cv(data_object, nq = 3, type = "mean")
 #'
 #' @export
-q_bme_cv <- function(data_object,  nsmax = 5, nq = 3,
-                   nhmax = 5, n = 50, zk_range = extended_range(data_object),
+q_bme_cv <- function(data_object,  nsmax = 5, nhmax = 5, n = 50, nq = 3,
+                     zk_range = extended_range(data_object),
                    type) {
   type <- match.arg(type, choices = c("mean", "mode"))
   col_idx <- if (type == "mode") 1 else c(2, 3)
@@ -79,8 +77,8 @@ q_bme_cv <- function(data_object,  nsmax = 5, nq = 3,
     )
 
     est[i, ] <- q_bme_estimate(
-      x = ch[i, ], data_object = data_obj, nq = nq,
-      nsmax = nsmax, nhmax = nhmax, n = n,
+      x = ch[i, ], data_object = data_obj,
+      nsmax = nsmax, nhmax = nhmax, n = n, nq = nq,
       zk_range = zk_range
     )[, col_idx]
   }
