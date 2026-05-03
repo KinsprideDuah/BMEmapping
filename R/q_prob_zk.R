@@ -182,13 +182,5 @@ q_prob_zk <- function(x, data_object, nsmax = 5, nhmax = 5, n = 50, nq = 3,
   d <- data.frame("zk_i" = zk_vec, "prob_zk_i" = pk)
   df <- d[!rowSums(is.na(d)), ]
 
-  # Plot if requested
-  if (plot) {
-    plot(df$zk_i, df$prob_zk_i,
-         type = "l", xlab = "z", ylab = "f(z)",
-         main = "posterior density"
-    )
-  }
-
   return(structure(df, class = c("BMEmapping", "data.frame")))
 }

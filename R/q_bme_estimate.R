@@ -19,7 +19,7 @@
 # - A data frame of estimation locations with their corresponding bme mean,
 #   variance and mode estimates
 # ============================================================================
-new_bme_estimate <- function(x, data_object, a, b, nsmax = 5, nhmax = 5, n = 50,
+q_bme_estimate <- function(x, data_object, nsmax = 5, nhmax = 5, n = 50,
                              nq = 3, zk_range = extended_range(data_object)) {
 
   nk <- nrow(x)

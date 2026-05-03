@@ -54,7 +54,7 @@
 #' q_bme_predict(x, data_object, type = "mean")
 #'
 #' @export
-q_bme_predict <- function(x, ch, cs, zh, a, b, nsmax = 5, nhmax = 5, n = 50,
+q_bme_predict <- function(x, data_object, nsmax = 5, nhmax = 5, n = 50,
                             nq = 3, zk_range = range(zh, a, b),
                             type) {
   type <- match.arg(type, choices = c("mean", "mode"))
