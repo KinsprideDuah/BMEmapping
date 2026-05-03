@@ -1,4 +1,4 @@
-#' @title Bayesian Maximum Entropy (BME) Spatial Interpolation
+#' @title BME prediction
 #'
 #' @usage bme_predict(x, data_object, model, nugget, sill, range,
 #'                    nsmax = 5, nhmax = 5, n = 50,
