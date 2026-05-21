@@ -29,13 +29,26 @@ devtools::install_github("KinsprideDuah/BMEmapping")
 
 ## Functions
 
-`bme_map` - creates a `BMEmapping` object that contains all the data information necessary for BME interpolation.
+* **`bme_map`**
+  Constructs a `BMEmapping` object that encapsulates all required inputs (hard data, soft data, and spatial information) for performing BME interpolation.
 
-`prob_zk` - computes and optionally plots the posterior density estimate at a single unobserved location.
+* **`prob_zk`**
+  Computes the posterior probability density of the variable of interest at a single unobserved location.
 
-`bme_predict` - predicts the posterior mean or mode and the associated variance at an unobserved location.
+* **`q_prob_zk`**
+  Computes the posterior probability density at a single unobserved location using the quantile-based (QBME) approach.
 
-`bme_cv` - performs a cross-validation on the hard data to assess model performance.
+* **`bme_predict`**
+  Estimates the posterior mean or mode, along with the associated variance, at an unobserved location.
+
+* **`q_bme_predict`**
+  Estimates the posterior mean or mode and associated variance at an unobserved location using the QBME approach.
+
+* **`bme_cv`**
+  Performs cross-validation on hard data to evaluate predictive performance of the BME model.
+
+* **`q_bme_cv`**
+  Performs cross-validation on hard data to evaluate predictive performance using the QBME approach.
 
 
 ## Getting help

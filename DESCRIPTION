@@ -14,8 +14,9 @@ Description:
     measurements) and soft interval data (bounded or uncertain observations) 
     while incorporating prior knowledge and supporting variogram-based spatial 
     modeling. The BME methodology is described in Christakos (1990) 
-    <doi:10.1007/BF00890661> and Serre and Christakos (1999) 
-    <doi:10.1007/s004770050029>.
+    <doi:10.1007/BF00890661>, Serre and Christakos (1999) 
+    <doi:10.1007/s004770050029> and Duah (2026) 
+    <doi:10.1016/j.spasta.2026.100974>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -39,3 +40,4 @@ Imports:
 Depends: 
     R (>= 3.5)
 VignetteBuilder: knitr
+Config/Needs/website: rmarkdown

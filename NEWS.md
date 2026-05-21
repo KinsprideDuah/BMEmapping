@@ -12,7 +12,7 @@
 
 * Extended the zk-range by 20%. This accommodation provides better estimates. 
 
-* Updated the functions to compute the covariance matrices to better refelect 
+* Updated the functions to compute the covariance matrices to better reflect 
 the impact of a nugget.
 
 ## Minor Features
