@@ -9,3 +9,8 @@
 ^.*\.log$
 ^CRAN-SUBMISSION$
 ^vignettes/articles$
+^doc$
+^docs$
+^Meta$
+
+

@@ -24,10 +24,15 @@ URL: https://github.com/KinsprideDuah/BMEmapping
 BugReports: https://github.com/KinsprideDuah/BMEmapping/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Suggests: 
+Suggests:
+    dplyr,
+    ggspatial,
     knitr,
+    maps,
     rmarkdown,
-    testthat (>= 3.0.0)
+    scales,
+    testthat (>= 3.0.0),
+    tidyr
 Config/testthat/edition: 3
 Imports: 
     ggplot2,
