@@ -1,0 +1,298 @@
+#-------------------------------------------------------------------------------------------------------------------------------------#
+# Load required libraries #
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+library(tidyverse)
+library(locfit)
+library(devtools)
+library(ggplot2)
+library(gstat)
+library(sp)
+library(BMEmapping)
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(readxl)
+library(tidyverse)
+library(locfit)
+library(scales)
+library(cowplot)
+library(lattice)
+library(stars)
+library(maps)
+library(patchwork)
+load_all()
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+# Load data #
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# Soft data
+data <- read.csv(file = "SWE_data.csv")
+head(data)
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Fitting regression model and updating data
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+fit <- locfit(avg_VALUE ~ ELEVATION, data = data)
+
+# Predict fitted values 
+SD <- data %>%
+  mutate(PRED = fitted(fit),
+         avg_RES = residuals(fit),
+         res_LOW = avg_LOW - PRED,
+         res_UPP = avg_UPP - PRED)
+
+# Correlation between SWE and elevation
+cor(SD$avg_VALUE, SD$PRED, method = "pearson")
+
+# ggplot version
+ggplot(SD, aes(x = ELEVATION, y = avg_VALUE)) +
+  geom_point(aes(color = TYPE, shape = TYPE), size = 2, alpha = 0.8) +
+  geom_line(aes(y = PRED), color = "blue", linewidth = 0.8) +
+  labs(x = "Elevation (m)",
+       y = "Average SWE (mm)",
+       color = "Type",
+       shape = "Type") +
+  annotate("text",
+           x = Inf, y = Inf,
+           label = "bold(r==-0.69)",
+           parse = TRUE,
+           hjust = 1.1, vjust = 1.5,
+           size = 4) +
+  theme(
+    panel.background = element_rect(fill = "white", colour = "black"),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    panel.grid = element_blank(),
+    plot.background = element_blank()
+  )
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Variogram fitting
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# convert SD to sf object (lat/long = EPSG:4326)
+df_proj <- st_as_sf(SD, coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
+
+# transform to UTM Zone 12N (EPSG:26912)
+df_data <- st_transform(df_proj, 26912)
+
+# check
+st_crs(df_data)
+
+# fitting the variogram
+vg <- variogram(avg_RES ~ 1, data = df_data)
+cut_off <- 1.2915 * vg[which.max(vg$gamma), "dist"]
+vg <- variogram(avg_RES ~ 1, cutoff = cut_off, data = df_data)
+vg_model <- fit.variogram(vg, model = vgm(c("Sph", "Exp")))
+vg_model
+
+# Remove rows 14 and 15 like you did in plot()
+vg_clean <- vg[-c(14, 15), ]
+
+# Get fitted line
+vg_line <- variogramLine(vg_model, maxdist = max(vg$dist))
+
+# variogram plot
+ggplot(data = vg[-c(14, 15), ]) +
+  geom_point(aes(x = dist, y = gamma), size = 1) +
+  geom_line(data = vg_line, aes(x = dist, y = gamma), color = "blue", linewidth = 0.5) +
+  labs(x = "Distance(m)",
+       y = "semivariance") +
+  scale_x_continuous(labels = label_number()) +
+  scale_y_continuous(labels = label_number()) +
+  theme(
+    panel.background = element_rect(fill = "white", colour = "black"),
+    panel.grid = element_blank(),
+    plot.background = element_blank(),
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 12),
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5)
+  )
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Posterior density estimation and plots selected locations
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# set model parameters
+model <- as.character(vg_model[2, 1])
+nugget <- vg_model[1, 2]
+sill <- vg_model[2, 2]
+range <- vg_model[2, 3]/10000 # res-calling range after the transformation
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Data partitioning
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# hard data indices
+nh <- 1:sum(SD$TYPE == "hard")
+
+# hard data locations
+ch <- SD[nh, c("LATITUDE", "LONGITUDE")]
+
+# hard data values
+zh <- SD[nh, "avg_RES"]
+
+# soft data locations
+cs <- SD[-nh, c("LATITUDE", "LONGITUDE")]
+
+# lower and upper bounds of soft data (intervals)
+a <- SD[-nh, "res_LOW"]
+b <- SD[-nh, "res_UPP"]
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     LOOCV: Perform BME estimation
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+## mode
+zk_bme_mean <- bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, type = "mean")
+zk_new_mean <- new_bme_cv(ch, cs, zh, a, b, nq = 8, type = "mean")
+
+## mode
+zk_bme_mode <- bme_cv(ch, cs, zh, a, b, model, nugget, sill, range, type = "mode")
+zk_new_mode <- new_bme_cv(ch, cs, zh, a, b, nq = 8, type = "mode")
+
+# Coefficient of Determination (R²)
+R2_mode_new = 1 - round((sum(zk_bme_mode$results$residual^2) /
+                           sum((zk_bme_mode$results$observed -
+                                  mean(zk_bme_mode$results$observed))^2)), 3)
+
+R2_mean_new = 1 - round((sum(zk_bme_mean$results$residual^2) /
+                           sum((zk_bme_mean$results$observed -
+                                  mean(zk_bme_mean$results$observed))^2)), 3)
+
+R2_mode_old = 1 - round((sum(zk_new_mode$results$residual^2) /
+                           sum((zk_new_mode$results$observed -
+                                  mean(zk_new_mode$results$observed))^2)), 3)
+
+R2_mean_old = 1 - round((sum(zk_new_mean$results$residual^2) /
+                           sum((zk_new_mean$results$observed -
+                                  mean(zk_new_mean$results$observed))^2)), 3)
+
+# Check metrics
+cbind(Method = c("QBME mode", "CBME mode", "", "QBME mean", "QBME mean"),
+      rbind(round(rbind(zk_bme_mode$metrics, zk_new_mode$metrics), 3),
+            c(rep(" ", 3)),
+            round(rbind(zk_bme_mean$metrics, zk_new_mean$metrics), 3)),
+      Rsquare = c(R2_mode_new, R2_mode_old, " ", R2_mean_new, R2_mean_old))
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Creating a regular grid for Prediction maps
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# Convert to sf polygon
+montana_sf <- st_as_sf(montana, coords = c("long", "lat"), crs = 4326) %>%
+  group_by(group) %>%
+  summarise(geometry = st_combine(geometry)) %>%
+  st_cast("POLYGON") %>%
+  st_union()  # single polygon for Montana
+
+# Create grid
+grid_points <- st_make_grid(
+  montana_sf,
+  cellsize = 0.01, # degrees; smaller = denser grid
+  what = "centers"
+)
+
+# Convert grid to sf object
+grid_sf <- st_sf(geometry = grid_points)
+
+# Keep only points that fall inside Montana
+# Filter grid points that are inside Montana
+grid_in_montana <- grid_sf[st_within(grid_sf, montana_sf, sparse = FALSE), ]
+
+# Convert to a data frame for plotting (optional)
+grid_df <- as.data.frame(st_coordinates(grid_in_montana))
+colnames(grid_df) <- c("long", "lat")
+head(grid_df)
+dim(grid_df)
+
+
+proj <- st_crs("EPSG:26912")
+UTD <- sf::st_as_sf(grid_df, coords = c("long", "lat"))
+st_crs(UTD) <- st_crs("EPSG:4326")
+
+# Reproject the data to the recommended UTM NAD83 12N projection
+Data <- st_transform(UTD, crs = proj)
+
+Data_P <- Data |>
+  dplyr::mutate(x = st_coordinates(geometry)[ , 1],
+                y = st_coordinates(geometry)[, 2]) |>
+  st_drop_geometry()
+
+#-------------------------------------------------------------------------------------------------------------------------------------#
+#     Prediction Maps
+#-------------------------------------------------------------------------------------------------------------------------------------#
+
+# Get Montana map polygon and convert to sf format
+montana <- map_data("state", region = "montana")
+
+Grid_Pred <- read.csv("True_Montana_Grid_Pred.csv")
+Grid_Pred <- Grid_Pred %>%
+  transform(BME_mode = BME_mode,
+            BME_mean = BME_mean)
+Grid_Pred_df <- cbind(grid_df, Grid_Pred)
+
+val <- range(c(na.omit(Grid_Pred_df[,3:4])))
+brks <- seq(val[1], val[2], length.out = 8)[2:7]
+
+P1 <- ggplot() +
+  geom_polygon(
+    data = montana,
+    aes(x = long, y = lat, group = group),
+    fill = "white", color = "black"
+  ) +
+  geom_point(
+    data = Grid_Pred_df,
+    aes(x = long, y = lat, color = BME_mode),
+    size = 0.8, show.legend = FALSE
+  ) +
+  scale_color_gradientn(
+    colours = c("blue", "green", "yellow", "red")
+  ) +
+  #coord_quickmap() +
+  labs(title = "BME mode",
+       x = "", y = "") +
+  theme(text = element_text(size = 13),
+        panel.background = element_rect(fill = "white", color = "black"),
+        plot.title = element_text(size = 14, hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+P2 <- ggplot() +
+  geom_polygon(
+    data = montana,
+    aes(x = long, y = lat, group = group),
+    fill = "white", color = "black"
+  ) +
+  geom_point(
+    data = Grid_Pred_df,
+    aes(x = long, y = lat, color = BME_mean),
+    size = 0.8, show.legend = TRUE
+  ) +
+  scale_color_gradientn(
+    colours = c("blue", "green", "yellow", "red"),
+    breaks = brks,      # controls positions
+    labels = round(brks/10, 2),           # custom labels (vector)
+    oob = scales::squish
+  ) +
+  #coord_quickmap() +
+  labs(title = "BME mean",
+       color = "Residuals",
+       x = "", y = "") +
+  theme(text = element_text(size = 13),
+        legend.key.height = unit(1.8, 'cm'),
+        legend.key.width = unit(0.3, 'cm'),
+        panel.background = element_rect(fill = "white", color = "black"),
+        plot.title = element_text(size = 14, hjust = 0.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+
+# side by side maps
+P1 + P2
+
+
