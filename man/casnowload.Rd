@@ -22,7 +22,7 @@ measurements have LOWER < RTSL < UPPER.}
 }
 }
 \source{
-\url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
+\url{https://www.ncei.noaa.gov/pub/data/ghcn/daily/}
 }
 \usage{
 casnowload

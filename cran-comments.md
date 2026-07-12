@@ -1,53 +1,50 @@
 ## Major Changes
 
-1. **Added an argument to specify the range for posterior density estimation.**  
-   Users can now choose their own range for posterior density estimation based on their data.
-
-2. **Added an argument to specify the lenth of `zk_vector` for posterior density estimation.**  
-   Users can now specify the length of the `zk_vector` for posterior density estimation.
-
-3. **Added a function to compute the posterior density estimation**  
-   Users can now compute the posterior density for various locations using the `prob_zk()`.
-   
-4. **Added S3 method functions**  
-   Available S3 method functions for plotting and summarizing prediction results.
-   
-5. **Added `bme_map` function**  
-   Included a `bme_map()` to create `BMEmapping` class objects and store data in a specific way.
+1. **Integrated Quantile-Based BME Framework (QBME)**
+Introduced a suite of core functions (`q_bme_predict()`, `q_bme_predict_ci()`, `q_bme_cv()`, and `q_prob_zk()`) that execute spatial continuity modeling via internal, quantile-specific variogram ensembles, bypassing manual parameter selection.
+2. **Added User-Specified Parameter Ranges for Density Functions**
+Users can now selectively pass customized bounds via the `zk_range` argument to explicitly set the support domain for localized posterior density estimations.
+3. **Added Granular Resolution Scaling (`n` Vector Length)**
+Users can now specify the length of the internal `zk_vector` evaluation space via the `n` parameter, allowing for direct control over computational speed versus localized integration precision.
+4. **Added Comprehensive S3 Methods**
+Implemented native `plot()` and `summary()` extensions for predictions, cross-validations, and density collections to automatically build diagnostic statistics (ME, MAE, RMSE, $R^2$) and spatial maps.
+5. **Formalized Object Pipelines via `bme_map()**`
+Introduced a unified initialization constructor to systematically validate coordinate structures, hard measurements, and soft intervals into strict `BMEmapping` class objects prior to execution.
 
 ## Minor Patches
 
-1. **Improved error handling and messaging**  
-   Enhanced internal checks for input consistency and added user-friendly error messages in key functions like `bme_predict()` and `bme_cv()`.
+1. **Namespace & Global Variable Auditing**
+Explicitly namespaced standard statistical functions (`stats::approx()`, `stats::density()`) and mapped unquoted ggplot columns to the `rlang::.data` pronoun to clean up strict compilation bindings.
+2. **Input Sanitization & Error Handling**
+Hardened sanity checks for structural data dimensionality across cross-validation routines to output clear, human-readable logging errors for degenerate or ill-conditioned covariance matrices.
+3. **URL Endpoint & Documentation Overhaul**
+Corrected permanently moved NOAA external data paths and expanded vignette tutorials to showcase both Classical and Quantile-Based geostatistical mapping tracks.
 
-2. **Documentation and vignette improvements**  
-   Updated function documentation and expanded the main vignette to include a complete real-world example and best practices for model tuning.
+---
 
-
-
-## Resubmission
+## Resubmission / Response to CRAN Notes
 
 This is a resubmission.
 
+### CRAN Incoming Feasibility Response:
 
+> *NOTE: Version contains large components (1.2.2.9000)*
+
+* **Correction:** The version number has been officially bumped and structured out of development component suffixes (`.9000`) to match CRAN production specifications. This major framework expansion is submitted cleanly as version **`2.0.0`**.
+
+---
 
 ## R CMD check results
 
 Checked on:
 
-- Local machine (macOS/Linux, R 4.4.0)
-- win-builder (devel) via `devtools::check_win_devel()`
+* Local Machine (Windows 11 / R 4.5.0)
+* win-builder (devel) via `devtools::check_win_devel()`
 
-Results:
+Results: **0 errors | 0 warnings | 0 notes**
 
-0 errors | 0 warnings | 0 notes
-
-
+---
 
 ## Downstream dependencies
 
-There are currently no known downstream dependencies affected by this update.  
-Changes are backward-compatible where possible and enhancements are clearly documented.
-
-
-
+There are currently no known downstream dependencies affected by this update. Changes are designed to maintain full backward compatibility with the classical baseline pipeline while expanding capabilities natively.

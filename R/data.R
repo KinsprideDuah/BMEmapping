@@ -20,7 +20,7 @@
 #'               lower, upper and center values are the same. Indirect
 #'               measurements have LOWER < RTSL < UPPER.}
 #' }
-#' @source \url{https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/}
+#' @source [https://www.ncei.noaa.gov/pub/data/ghcn/daily/](https://www.ncei.noaa.gov/pub/data/ghcn/daily/)
 "casnowload"
 
 
