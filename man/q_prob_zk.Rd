@@ -13,11 +13,11 @@ location.}
 
 \item{data_object}{A list containing the hard and soft data.}
 
-\item{nsmax}{An integer specifying the maximum number of nearby soft data
-points to include for estimation (default is 5).}
+\item{nsmax}{A positive numeric value specifying the maximum number of nearby
+soft data points to include for estimation (default is 5).}
 
-\item{nhmax}{An integer specifying the maximum number of nearby hard data
-points to include for estimation (default is 5).}
+\item{nhmax}{A positive numeric value specifying the maximum number of nearby
+hard data points to include for estimation (default is 5).}
 
 \item{n}{An integer indicating the number of points at which to evaluate the
 posterior density over \code{zk_range} (default is 50).}

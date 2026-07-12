@@ -1,57 +1,77 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-### Spatial Interpolation for data comprising hard and soft-interval forms
+# Spatial Interpolation using Bayesian Maximum Entropy
 
-The **Bayesian Maximum Entropy (BME)** framework provides a flexible and
-principled approach to space-time data analysis by combining Bayesian
-inference with the maximum entropy principle. It supports optimal
-estimation using both precise (hard) and uncertain (soft) data, such as
-intervals or probability distributions—making it ideal for complex,
-real-world datasets. The **BMEmapping** R package implements core BME
-methods for spatial interpolation, enabling the integration of
-heterogeneous data, variogram-based modeling, and uncertainty
-quantification.
+The **BMEmapping** R package delivers a flexible, robust, and
+computationally optimized framework for spatial interpolation and
+uncertainty quantification using the **Bayesian Maximum Entropy (BME)**
+paradigm. Unlike traditional kriging frameworks that rely strictly on
+precise physical measurements (**hard data**), **BMEmapping** allows for
+the systematic integration of bounded uncertainty domains
+(**soft-interval data**) without resorting to linear or Gaussian
+assumptions.
+
+The package features two operational geostatistical engines:
+
+- **Classical BME (CBME):** Integrates structural general-knowledge via
+  user-defined theoretical variogram parameters.
+- **Quantile-Based BME (QBME):** Bypasses manual variogram fitting by
+  internally constructing an ensemble of localized, quantile-specific
+  variogram structures to capture spatial continuity adaptively across
+  different levels of the data distribution.
 
 ## Installation
 
 You can install the development version of **BMEmapping** from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/) using `devtools`:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("KinsprideDuah/BMEmapping")
 ```
 
-## Functions
+## Core Functions
 
-- **`bme_map`** Constructs a `BMEmapping` object that encapsulates all
-  required inputs (hard data, soft data, and spatial information) for
-  performing BME interpolation.
+### Data Pipeline Configuration
 
-- **`prob_zk`** Computes the posterior probability density of the
-  variable of interest at a single unobserved location.
+- **`bme_map`** Constructs a unified data object encapsulating
+  coordinate structures, spatial attributes, hard measurements, and
+  soft-interval constraints to condition the interpolation space.
 
-- **`q_prob_zk`** Computes the posterior probability density at a single
-  unobserved location using the quantile-based (QBME) approach.
+### Posterior Density Estimation
 
-- **`bme_predict`** Estimates the posterior mean or mode, along with the
-  associated variance, at an unobserved location.
+- **`prob_zk`** Computes posterior densities using the CBME approach.
+- **`q_prob_zk`** Computes posterior densities using the QBME approach.
 
-- **`q_bme_predict`** Estimates the posterior mean or mode and
-  associated variance at an unobserved location using the QBME approach.
+### Probabilistic Spatial Prediction & Uncertainty Estimation
 
-- **`bme_cv`** Performs cross-validation on hard data to evaluate
-  predictive performance of the BME model.
+- **`bme_predict`** Computes spatial point estimates (*mean*, *median*,
+  or *mode*) using the CBME approach.
+- **`q_bme_predict`** Computes spatial point estimates (*mean*,
+  *median*, or *mode*) using the QBME approach.
+- **`bme_predict_ci`** Constructs credible intervals using the CBME
+  approach.
+- **`q_bme_predict_ci`** Constructs credible intervals using the QBME
+  approach.
 
-- **`q_bme_cv`** Performs cross-validation on hard data to evaluate
-  predictive performance using the QBME approach.
+### Model Validation & S3 Graphics
 
-## Getting help
+- **`bme_cv`** Executes K-fold or exact Leave-One-Out Cross-Validation
+  (LOOCV) at hard data locations using the CBME approach.
+- **`q_bme_cv`** Executes K-fold or exact LOOCV at hard data locations
+  using the QBME approach.
+- **`summary()`** Provides standard geostatistical error metrics for
+  **BMEmapping** objects.
+- **`plot()`** Provides graphical visualzations (spatial, prediction and
+  residual plots) of **BMEmapping** objects.
 
-If you encounter a clear bug, please file an issue with a minimal
-reproducible example on
-[GitHub](https://github.com/KinsprideDuah/BMEmapping/issues).
+## Getting Help
+
+If you encounter a bug or have structural feature requests, please file
+a ticket alongside a minimal reproducible example (reprex) on the
+[GitHub Issues
+page](https://github.com/KinsprideDuah/BMEmapping/issues).
 
 ## Author
 

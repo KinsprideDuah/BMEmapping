@@ -47,3 +47,22 @@ test_that("posterior mean function works", {
 
   expect_equal(round(k1, 2), round(k2, 2))
 })
+
+# test for posterior median
+test_that("posterior median function works", {
+  data_object <- bme_map(ch, cs, zh, a, b)
+
+  k1 <- bme_estimate(x,
+                     data_object = data_object, model = "exp",
+                     nugget = 0.0953, sill = 0.3639, range = 1.0787,
+                     zk_range = c(-1.5, 2.5)
+  )[3]
+
+  k2 <- bme_predict(x,
+                    data_object = data_object, model = "exp",
+                    nugget = 0.0953, sill = 0.3639, range = 1.0787,
+                    zk_range = c(-1.5, 2.5), type = "median"
+  )[[3]]
+
+  expect_equal(round(k1, 2), round(k2, 2))
+})

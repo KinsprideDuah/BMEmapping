@@ -13,14 +13,14 @@ locations.}
 
 \item{data_object}{A list containing the hard and soft data.}
 
-\item{nsmax}{An integer specifying the maximum number of nearby soft data
-points to include for estimation (default is 5).}
+\item{nsmax}{A positive numeric value specifying the maximum number of nearby
+soft data points to include for estimation (default is 5).}
 
-\item{nhmax}{An integer specifying the maximum number of nearby hard data
-points to include for estimation (default is 5).}
+\item{nhmax}{A positive numeric value specifying the maximum number of nearby
+hard data points to include for estimation (default is 5).}
 
-\item{n}{An integer indicating the number of points at which to evaluate the
-posterior density over \code{zk_range} (default is 50).}
+\item{n}{A positive numeric value indicating the number of points at which to
+evaluate the posterior density over \code{zk_range} (default is 50).}
 
 \item{nq}{A positive numeric value for the number of quantile levels
 (default is 3).}
@@ -41,27 +41,26 @@ A data frame with either 3 or 4 columns, depending on the prediction
 type. The first two columns contain the geographic coordinates. If
 \code{type = "mean"}, the third and fourth columns represent the
 posterior mean and its associated variance, respectively. If
-\code{type = "mode"}, only a third column is returned for the
-posterior mode.
+\code{type = "mode" or "median"}, only a third column is returned for
+the posterior mode or median.
 }
 \description{
-\code{q_bme_predict} performs BME spatial interpolation at user-specified
+\code{bme_predict} performs BME spatial interpolation at user-specified
 estimation locations. It uses both hard data (precise measurements) and soft
 data (interval or uncertain measurements), along with a specified variogram
-model, to compute either the posterior mean or mode and associated variance
-for each location. This function enables spatial prediction in settings where
-uncertainty in data must be explicitly accounted for, improving estimation
-accuracy when soft data is available.
+model, to compute either the posterior mean (and its associated variance),
+mode or median for each location. This function enables spatial prediction in
+settings where uncertainty in data must be explicitly accounted for,
+improving estimation accuracy when soft data is available.
 }
 \examples{
 data("utsnowload")
-x <- utsnowload[1, c("latitude", "longitude")]
-ch <- utsnowload[2:67, c("latitude", "longitude")]
+x <- utsnowload[1:3, c("latitude", "longitude")]
+ch <- utsnowload[6:67, c("latitude", "longitude")]
 cs <- utsnowload[68:232, c("latitude", "longitude")]
-zh <- utsnowload[2:67, c("hard")]
+zh <- utsnowload[6:67, c("hard")]
 a <- utsnowload[68:232, c("lower")]
 b <- utsnowload[68:232, c("upper")]
 data_object <- bme_map(ch, cs, zh, a, b)
 q_bme_predict(x, data_object, type = "mean")
-
 }

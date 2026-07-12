@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.BMEmapping.R
 \name{plot.BMEmapping}
 \alias{plot.BMEmapping}
-\title{Plot Method for BMEmapping Objects (ggplot2)}
+\title{Plot Method for BMEmapping Objects}
 \usage{
 \method{plot}{BMEmapping}(x, ...)
 }
@@ -11,7 +11,20 @@
 
 \item{...}{Additional arguments (currently unused).}
 }
+\value{
+A \pkg{ggplot2} object or an arranged collection of plots,
+returned invisibly.
+}
 \description{
-Uses ggplot2 to generate diagnostic or posterior density plots for objects
-of class \code{"BMEmapping"} returned by \code{bme_cv()} or \code{prob_zk()}.
+Generates graphical displays for objects of class \code{"BMEmapping"}.
+The output depends on the object type:
+\itemize{
+\item Objects returned by \code{bme_map()} produce a spatial plot showing
+hard and soft data locations.
+\item Objects returned by \code{prob_zk()} produce posterior density plots.
+\item Objects returned by \code{bme_predict()} or \code{bme_interval()}
+produce spatial prediction maps.
+\item Objects returned by \code{bme_cv()} produce diagnostic plots for
+evaluating prediction performance.
+}
 }

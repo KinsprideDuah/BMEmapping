@@ -30,7 +30,7 @@ ch <- matrix(c(1, 2, 3, 4), ncol = 2)
 cs <- matrix(c(5, 6, 7, 8), ncol = 2)
 zh <- c(10, 20)
 a <- c(8, 9)
-b <- c(12, 14)
+b <- c(12, 13)
 obj <- bme_map(ch, cs, zh, a, b)
 class(obj) # "BMEmapping"
 

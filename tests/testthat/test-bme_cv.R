@@ -15,7 +15,7 @@ test_that("bme CV function works", {
   k1 <- bme_cv(
     data_object = data_object, model = "exp",
     nugget = 0.0953, sill = 0.3639, range = 1.0787,
-    zk_range = c(-1.5, 2.5), type = "mean"
+    zk_range = c(-1.5, 2.5), k = 9, type = "mean"
   )
 
   k2 <- c(nrow(ch), 7)
@@ -31,7 +31,7 @@ test_that("bme CV function works", {
   k3 <- bme_cv(
     data_object = data_object, model = "exp",
     nugget = 0.0953, sill = 0.3639, range = 1.0787,
-    zk_range = c(-1.5, 2.5), type = "mode"
+    zk_range = c(-1.5, 2.5), k = 9, type = "mode"
   )
 
   k4 <- c(nrow(ch), 6)

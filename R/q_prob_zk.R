@@ -8,10 +8,10 @@
 #' @param data_object A list containing the hard and soft data.
 #' @param nq A positive numeric value for the number of quantile levels
 #'        (default is 3).
-#' @param nsmax An integer specifying the maximum number of nearby soft data
-#'        points to include for estimation (default is 5).
-#' @param nhmax An integer specifying the maximum number of nearby hard data
-#'        points to include for estimation (default is 5).
+#' @param nsmax A positive numeric value specifying the maximum number of nearby
+#'        soft data points to include for estimation (default is 5).
+#' @param nhmax A positive numeric value specifying the maximum number of nearby
+#'        hard data points to include for estimation (default is 5).
 #' @param n An integer indicating the number of points at which to evaluate the
 #'        posterior density over \code{zk_range} (default is 50).
 #' @param nq An integer indicating the number of quantile levels (default is 3).

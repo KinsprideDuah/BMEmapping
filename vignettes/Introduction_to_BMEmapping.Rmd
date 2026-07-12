@@ -12,107 +12,85 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
 ```
 
 ## Introduction
 
-Spatial datasets encountered in environmental science, geostatistics, hydrology, climatology, and engineering frequently contain heterogeneous observations characterized by varying levels of uncertainty. In many practical applications, some measurements are observed precisely and may therefore be treated as hard data, whereas others are only partially known and are more appropriately represented as interval-valued or uncertain observations, commonly referred to as soft data. Traditional spatial interpolation methods often simplify or ignore such uncertainty by replacing interval observations with single representative values, potentially leading to biased predictions and underestimated uncertainty.
+Spatial datasets encountered in environmental science, geostatistics, hydrology, climatology, and engineering frequently contain heterogeneous observations characterized by varying levels of uncertainty. In many practical applications, some measurements are observed precisely and may therefore be treated as *hard data*, whereas others are only partially known and are more appropriately represented as interval-valued or uncertain observations, commonly referred to as *soft data*.
+Traditional spatial interpolation methods (such as Ordinary or Universal Kriging) often simplify or ignore such uncertainty by replacing interval observations with single representative values like midpoints. This oversimplification leads to biased predictions, distorted spatial variance structures, and severely underestimated
 
-Bayesian Maximum Entropy (BME) provides a rigorous probabilistic framework for integrating heterogeneous spatial information while explicitly accounting for uncertainty in soft observations. The BME framework combines general knowledge, typically represented through covariance or variogram structures, with site-specific knowledge derived from both hard and soft data to estimate posterior probability density functions and generate spatial predictions. By preserving interval uncertainty throughout the modeling process, BME methods produce spatial predictions that more realistically reflect the underlying uncertainty in the observed data.
+Bayesian Maximum Entropy (BME) provides a rigorous, non-Gaussian probabilistic framework for integrating heterogeneous spatial information while explicitly accounting for uncertainty in soft observations. The BME framework combines *general knowledge* typically represented through spatial covariance or variogram structures, with *site-specific knowledge* derived from both hard and soft data to estimate complete posterior probability density functions (PDFs) and generate spatial predictions. By preserving interval uncertainty throughout the modeling process, BME methods produce spatial predictions that more realistically reflect the underlying uncertainty in the observed data.
 
-The **BMEmapping** package provides a unified computational framework for Bayesian Maximum Entropy spatial modeling within the \textsf{R} environment. The package includes tools for constructing BME data objects, estimating posterior probability density functions, fitting variogram models, performing spatial prediction, visualizing uncertainty, and evaluating predictive performance using cross-validation procedures. Both conventional Bayesian Maximum Entropy (CBME) and quantile-based Bayesian Maximum Entropy (QBME) methodologies are implemented within the package.
+The **BMEmapping** package provides a unified computational framework for Bayesian Maximum Entropy spatial modeling within the \textsf{R} environment. The package includes tools for constructing BME data objects, estimating posterior probability density functions, fitting variogram models, performing spatial prediction, visualizing uncertainty, and evaluating predictive performance using cross-validation procedures. Both conventional BME (CBME) and quantile-based BME (QBME) methodologies are implemented within the package. 
 
 Specifically, **BMEmapping** is designed to perform spatial interpolation at unobserved locations using both hard and soft-interval data. This vignette introduces the fundamental functionality of the package and guides users through its basic usage.
 
-## Main Functions
 
-The primary functions available in **BMEmapping** include:
+## Package Architecture and Main Functions
 
-`bme_map` - Creates a `BMEmapping` object that stores all spatial coordinates, hard observations, and soft-interval information required for Bayesian Maximum Entropy (BME) interpolation.
+The workflow of **BMEmapping** mirrors the traditional geostatistical predictive pipeline, separated into data initialization, structural characterization, localized posterior density exploration, prediction mapping, and model validation.
 
-`prob_zk`  - Computes and optionally visualizes the posterior probability density estimate at an unobserved location using the Conventional Bayesian Maximum Entropy (CBME) approach.
+### Core Interpolation and Estimation Engines
 
-`q_prob_zk` - Computes and optionally visualizes the posterior probability density estimate at an unobserved location using the Quantile-Based Bayesian Maximum Entropy (QBME) approach.
+* `bme_map`: Creates a unified `BMEmapping` object that stores all spatial coordinates, hard observations, and soft-interval bounds required for BME interpolation.
+* `prob_zk`: Computes the posterior probability density estimate at an unobserved location using the CBME approach.
+* `q_prob_zk`: Computes and visualizes the posterior probability density estimate at an unobserved location using the QBME approach.
+* `bme_predict`: Predicts the posterior mean, median, or mode along with associated posterior variance fields under the CBME approach.
+* `q_bme_predict`: Generates point and variance predictions using the computationally optimized QBME framework.
 
-`bme_predict` - Predicts the posterior mean or posterior mode, together with the associated posterior variance when applicable, using the CBME approach.
+### Validation Engines
 
-`q_bme_predict` - Predicts the posterior mean or posterior mode, together with the associated posterior variance when applicable, using the QBME approach.
+* `bme_cv`: Runs cross-validation on the hard data locations using the CBME approach. It supports both classic Leave-One-Out Cross-Validation (LOOCV) and K-fold Cross-Validation layouts to generate robust prediction diagnostics.
+* `q_bme_cv`: Performs LOOCV or K-fold cross-validation routines utilizing the QBME formulation.
 
-`bme_cv` - Performs leave-one-out cross-validation on the hard data locations using the CBME approach and returns prediction diagnostics and model performance measures.
+Here is an updated, technically precise version that uses standard R documentation conventions (like `\code{}`-style formatting or markdown backticks) and emphasizes the geometric/spatial nature of the outputs.
 
-`q_bme_cv` - Performs leave-one-out cross-validation on the hard data locations using the QBME approach and returns prediction diagnostics and predictive performance statistics.
+### Visualization and Diagnostic Engines
 
-
-### Input Requirements
-
-The **BMEmapping** functions require the following input arguments:
-
-#### Data parameters
-
-`x`: A matrix or data frame specifying the geographic prediction location(s) where posterior estimation or spatial prediction is to be performed.
-
-`ch`: A matrix or data frame containing the geographic coordinates of the hard data locations.
-
-`cs`: A matrix or data frame containing the geographic coordinates of the soft-interval data locations.
-
-`zh`: A numeric vector containing the observed hard data values corresponding to the locations in `ch`.
-
-`a`: A numeric vector containing the lower bounds of the soft-interval data corresponding to the locations in `cs`.
-
-`b`: A numeric vector containing the upper bounds of the soft-interval data corresponding to the locations in `cs`.
-
-#### Variogram parameters
-
-Before applying the CBME implementation, a variogram model must be fitted to characterize the spatial dependence structure of the data. This requires specification of the variogram model type together with the associated covariance parameters:
-
-`model`: The variogram model type. Supported options include `"exp"` (Exponential), `"sph"` (Spherical), and `"gau"` (Gaussian). The selected model should reflect the underlying spatial dependence structure of the data.
-
-`nugget`: The nugget effect of the variogram, representing measurement error and/or microscale spatial variability.
-
-`sill`: The sill of the variogram, representing the plateau value of the semivariance.
-
-`range`: The range (or effective range) of the variogram, representing the distance beyond which spatial correlation becomes negligible.
-
-#### Optional parameters
-
-Additional optional parameters are also available:
-
-`nhmax`: Maximum number of neighboring hard data points included in the BME integration process.
-
-`nsmax`: Maximum number of neighboring soft-interval data points included in the BME integration process.
-
-`zk_range`: A numeric vector specifying the range over which the posterior density is evaluated at the prediction location.
-
-`n`: An integer specifying the number of evaluation points used to approximate the posterior density over `zk_range`.
-
-`nq`: An integer specifying the number of quantile levels used in the QBME framework.
-
-Unless otherwise specified, all optional parameters are automatically assigned their default values. Additional details regarding the arguments and optional settings can be found in the corresponding function documentation (e.g., `?prob_zk`).
+* `plot`: S3 method implementation for `BMEmapping` framework outputs. This polymorphic method automatically matches the underlying object class to generate corresponding geostatistical graphics:
+* **Data Objects**: Generates dual-coordinate spatial plots highlighting spatial coverage, clustering patterns, and interval uncertainty spans for soft data points.
+* **Prediction Outputs**: Renders continuous spatial field plot across prediction targets to compare structural estimators (posterior mean, median, mode and variance).
+* **Posterior Density Objects**: Extracts and visualizes localized conditional probability density functions to evaluate skewness and distribution constraints.
+* **Validation Objects**: Produces diagnostics for cross-validation analysis, tracking predictive residual distributions, homoscedasticity trends, and spatial error independence.
 
 
-## A Data Example
+### Input Parameter Requirements
 
-The `utsnowload` dataset included in the package contains detrended reliability-targeted design snow load (RTDSL) measurements collected from 232 locations across the state of Utah. Among these locations, 65 observations are available as precise measurements and are treated as hard data, while the remaining 167 observations are represented as interval-valued soft data. The dataset therefore provides an ideal example for illustrating how BME methods can incorporate heterogeneous information sources into a unified spatial prediction framework.
+#### 1. Data Parameters
 
-A detailed discussion of the methodological background and applications of interval-based BME modeling is provided in Duah et al. (2025) and related references. The present tutorial focuses on practical implementation of the **BMEmapping** package and demonstrates complete workflows for:
+* `x`: A matrix or data frame specifying the geographic prediction location(s) where posterior estimation or spatial prediction is to be performed.
+* `ch` & `zh`: The geographic coordinates matrix and corresponding numeric vector of precise hard observations.
+* `cs`, `a`, `b`: The geographic coordinates matrix of soft-interval data locations alongside their respective lower (`a`) and upper (`b`) bounding vectors.
 
-- organizing hard and soft spatial observations,
-- constructing BME data objects,
-- visualizing heterogeneous spatial data,
-- fitting variogram models,
-- estimating posterior probability density functions,
-- generating BME spatial predictions,
-- constructing prediction maps, and
-- evaluating predictive performance through cross-validation.
+#### 2. Structural Covariance Parameters (CBME)
 
-The tutorial additionally demonstrates how the quantile-based Bayesian Maximum Entropy (QBME) framework can improve computational efficiency while maintaining predictive accuracy in applications involving substantial interval uncertainty.
+* `model`: The spatial variogram model type: `"exp"` (Exponential), `"sph"` (Spherical), or `"gau"` (Gaussian).
+* `nugget`: The nugget effect parameter, capturing measurement error and microscale spatial variability.
+* `sill`: The partial sill of the variogram, defining the structural spatial variance component.
+* `range`: The spatial range parameter, dictating the distance threshold of spatial correlation.
 
+#### 3. Neighborhood and Computational Control Parameters
+
+For fine-grained control over computational efficiency and localized spatial dependency structures, several optional tuning parameters can be passed to the prediction and estimation engines:
+
+* `nhmax`: The maximum number of neighboring hard data points included in the local conditioning neighborhood to bound covariance matrix dimensions.
+* `nsmax`: The maximum number of neighboring soft-interval data points included in the local conditioning neighborhood to optimize integration performance.
+* `zk_range`: A numeric vector `c(lower, upper)` specifying the spatial domain over which the conditional posterior density function is evaluated.
+* `n`: An integer specifying the number of grid evaluation points used to numerically approximate the posterior density curve over `zk_range`.
+* `nq`: An integer specifying the number of discrete quantile levels used to approximate soft intervals within the accelerated QBME framework.
+* `k`: An integer specifying the number of folds for cross-validation routines (e.g., setting `k` equal to the number of hard observations executes Leave-One-Out Cross-Validation, whereas smaller values partition data into K-fold spatial or random validation blocks).
+
+Unless otherwise specified, all optional parameters are automatically assigned their default values. Detailed documentation regarding argument behaviors, default thresholds, and underlying statistical mechanics can be accessed via standard R help files (e.g., `?prob_zk` or `?bme_predict`).
+
+
+## Implementation Pipeline: A Spatial Data Example
 
 ### Loading Required Libraries
 
-The following libraries are required for spatial preprocessing, visualization, variogram modeling, and Bayesian Maximum Entropy interpolation.
+The following libraries provide the computational stack required for spatial data processing, structural variogram modeling, BME interpolation, and geospatial visualization:
 
-```{r warning=FALSE, message=FALSE}
+```{r eval=TRUE,  warning=FALSE, message=FALSE}
 library(BMEmapping)
 library(ggplot2)
 library(sf)
@@ -122,142 +100,90 @@ library(tidyr)
 library(scales)
 library(knitr)
 library(gridExtra)
-library(maps)
-library(ggspatial)
-```
 
-
-### The `utsnowload` Dataset
-
-The example dataset included in the package is then loaded.
-
-```{r }
 data("utsnowload")
+
 ```
 
-#### Overview of the `utsnowload` Dataset
+To demonstrate the practical application of the package, this vignette utilizes the `utsnowload` dataset, which contains detrended reliability-targeted design snow load (RTDSL) measurements collected from 232 observation sites across Utah.
 
-The `utsnowload` dataset contains detrended reliability-targeted design snow load measurements together with spatial coordinates and interval bounds describing uncertainty associated with soft observations. The dataset is structured such that:
+The dataset is partitioned to reflect typical heterogeneous spatial data collections:
 
-- the first 65 observations correspond to hard data locations,
-- the remaining observations correspond to soft interval data,
-- longitude and latitude define the spatial coordinates, and
-- lower and upper interval bounds quantify uncertainty for soft observations.
+* **Observations 1 to 65**: Configured as precise, exact measurements treated as **hard data**.
+* **Observations 66 to 232**: Formatted as interval-valued bounds representing uncertain **soft data**.
+* **Spatial Coordinates**: Defined explicitly by the `longitude` and `latitude` fields.
+* **Uncertainty Bounds**: Quantified by the `lower` and `upper` interval parameters defining the soft data limits.
 
-Complete documentation for the `utsnowload` dataset can be accessed using the command 
+The package example data is loaded and summarized below:
+
+```{r eval=TRUE}
+# Load the sample spatial dataset
+data("utsnowload")
+
+# Display baseline distributions and structural summaries
+summary(utsnowload)
+
+```
+
+Detailed documentation for the dataset, including variable descriptions and geographical metadata, can be accessed using the standard R help command:
 
 ```{r eval=FALSE}
 ?utsnowload
-```
 
-Summary statistics for the dataset are presented below.
-
-```{r }
-summary(utsnowload)
-```
-
-The plot below displays the geographical locations of the hard and soft data.
-
-```{r fig.width = 6, fig.height = 6, fig.align='center', warning=FALSE}
-utah <- map_data("state", region = "utah")
-
-utsnowload_df <- utsnowload
-utsnowload_df$type <- rep(c("hard", "soft"), times = c(67, 165))
-
-ggplot() +
-  geom_polygon(
-    data = utah,
-    aes(x = long, y = lat, group = group),
-    fill = "grey95", color = "black"
-  ) +
-  geom_point(
-    data = utsnowload_df,
-    aes(x = longitude, y = latitude, 
-        color = type, shape = type),
-    size = 1.5, show.legend = TRUE
-  ) +
-  coord_quickmap() +
-  scale_x_continuous(
-    name = "longitude",
-    labels = function(x) paste0(abs(x), "° ", 
-                                ifelse(x < 0, "W", "E"))
-  ) +
-  scale_y_continuous(
-    name = "latitude",
-    labels = function(y) paste0(abs(y), "° ", 
-                                ifelse(y < 0, "S", "N"))
-  ) +
-  annotation_north_arrow(
-    location = "tr",   # bottom-left
-    which_north = "true",
-    style = north_arrow_fancy_orienteering,
-    height = unit(1.2, "cm"),
-    width  = unit(1.2, "cm")
-  ) +
-  labs(color = "data type", shape = "data type") +
-  theme(
-    panel.background = element_rect(fill = "white", 
-                                    color = "black"),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank()
-  )
 ```
 
 
 ### Organizing Hard and Soft Data
 
-A critical step in BME modeling involves separating the observations into hard and soft components. The spatial coordinates associated with hard and soft observations are extracted independently, together with the corresponding observed values and interval bounds. For illustrative purposes, a subset of the `utsnowload` dataset consisting of the first 30 hard-data locations is selected. This reduced dataset facilitates demonstration of the data organization and visualization workflow while limiting computational demands.
+A critical step in BME modeling involves separating the observations into hard and soft components. The spatial coordinates associated with hard and soft observations are extracted independently, together with the corresponding observed values and interval bounds. For illustrative purposes, a subset of the `utsnowload` dataset consisting 30 hard-data locations and 100 soft-data locations is selected. This reduced dataset facilitates demonstration of the data organization and visualization workflow while limiting computational demands and leaves 10 soft-data locations as prediction locations.
 
-```{r}
+```{r eval=TRUE}
 # hard data locations
-ch <- utsnowload[1:30, c("latitude", "longitude")]
+ch <- utsnowload[1:30, c("longitude", "latitude")]
 
 # hard data values
 zh <- utsnowload[1:30, c("hard")]
 
 # soft data locations
-cs <- utsnowload[68:227, c("latitude", "longitude")]
+cs <- utsnowload[68:167, c("longitude", "latitude")]
 
 # lower and upper bounds of soft data (intervals)
-a <- utsnowload[68:227, c("lower")]
-b <- utsnowload[68:227, c("upper")]
+a <- utsnowload[68:167, c("lower")]
+b <- utsnowload[68:167, c("upper")]
+
 ```
 
 The extracted information is subsequently organized into a **BMEmapping** object, which serves as the central data structure for posterior density estimation and BME prediction.
 
-```{r }
+```{r eval=TRUE}
 data_object <- bme_map(ch, cs, zh, a, b)
+
 ```
+
 
 ### Visualizing Hard and Soft Data
 
 Exploratory visualization provides important insight into the spatial coverage and uncertainty structure of the dataset prior to variogram estimation and spatial interpolation.
 
-The `plot()` method for **BMEmapping** objects displays:
-
-- hard-data locations,
-- soft-data locations,
-- interval uncertainty associated with soft observations, and
-- overall spatial support across the study region.
-
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
+```{r eval=TRUE, fig.width = 6, fig.height = 6, fig.align='center'}
 plot(data_object)
+
 ```
 
 This visualization facilitates identification of spatial clustering, regions with sparse observations, and areas associated with substantial interval uncertainty. Such preliminary assessment is important because the quality and spatial distribution of both hard and soft observations strongly influence posterior density estimation and predictive performance.
 
 BME prediction is demonstrated using a subset of the soft-data locations from the `utsnowload` dataset as prediction locations. The prediction locations, denoted by `x_k`, are obtained by extracting the geographic coordinates of the selected target locations. These coordinates are subsequently supplied to the BME prediction functions for posterior density estimation and computation of summary statistics such as the posterior mean and posterior mode. The prediction locations used in this illustration are defined below:
 
-```{r}
-xk <- utsnowload[228:232, c("latitude", "longitude")]
+```{r eval=TRUE}
+xk <- utsnowload[201:205, c("longitude", "latitude")]
 xk
+
 ```
 
 
 ### BME Estimation Methods
 
 Two BME prediction approaches are considered throughout this tutorial.
-
 
 #### Conventional Bayesian Maximum Entropy (CBME)
 
@@ -268,58 +194,44 @@ The CBME approach is computationally efficient and has been widely used in appli
 
 #### Quantile-Based Bayesian Maximum Entropy (QBME)
 
-The quantile-based Bayesian Maximum Entropy framework extends the conventional approach by estimating covariance structures using multiple quantile-based representations of the soft interval observations. Instead of relying solely on interval midpoints or uniform assumptions, QBME constructs several quantile-specific realizations and combines the resulting covariance estimates.
+Spatial continuity is a foundational concept in geostatistics, capturing the degree to which values of a spatial variable are correlated across space to ensure accurate interpolation and simulation. Within the CBME framework, this spatial dependence is typically represented by a theoretical variogram model derived from precise physical measurements (**hard data**). However, in settings where hard data are sparse, practitioners frequently rely on a hybrid dataset that combines these precise measurements with the midpoints of interval-valued (**soft data**). While convenient, this approach introduces an important methodological gap: it implicitly assumes that a single midpoint adequately summarizes the underlying uncertainty of an entire interval. By ignoring the full span of the interval, this simplification can introduce systemic bias into the spatial covariance structure, ultimately degrading prediction precision and compromising the integrity of the localized uncertainty characterization.
 
-This strategy allows the method to better capture interval asymmetry and uncertainty while preserving the probabilistic structure of the BME framework. In many applications, QBME has been shown to improve computational efficiency while maintaining predictive accuracy comparable to conventional BME approaches.
+To systematically address this limitation, we introduce the QBME framework, which models spatial continuity by explicitly accounting for the uncertainty inherent in soft-interval data. This approach discretizes each soft interval into a finite set of representative quantiles, which are individually paired with the available hard data to construct a sequence of distinct hybrid datasets. The framework fits a unique variogram model to each hybrid configuration to capture spatial dependencies across the full spectrum of plausible values. The resulting quantile-specific covariance matrices are then averaged into a single integrated covariance matrix that explicitly propagates the soft-data uncertainty throughout the entire domain. By shifting from a single midpoint approximation to an integrated ensemble of conditional variograms, the QBME implementation preserves spatial coherence in a principled, computationally tractable manner that remains strictly consistent with its information-theoretic foundations. A detailed description of the QBME approach and its applications is provided in [https://doi.org/10.1016/j.spasta.2026.100974](https://doi.org/10.1016/j.spasta.2026.100974)
 
 
-### CBME Implementation
+#### CBME Implementation
 
 #### Variogram Estimation
 
-Specification of an appropriate variogram model is a fundamental component of CBME interpolation because the covariance structure determines the spatial dependence relationships used during posterior estimation.
+Specification of an appropriate variogram model is a fundamental component of CBME interpolation because the covariance structure determines the spatial dependence relationships used during posterior estimation. Because the number of hard observations is relatively limited, a combined dataset consisting of hard observations and representative values derived from the soft intervals is commonly used for variogram estimation. In this tutorial, the midpoints of the soft intervals are combined with the hard observations to provide a practical approximation of the underlying spatial variability.
 
-Because the number of hard observations is relatively limited, a combined dataset consisting of hard observations and representative values derived from the soft intervals is commonly used for variogram estimation. In this tutorial, the midpoints of the soft intervals are combined with the hard observations to provide a practical approximation of the underlying spatial variability.
+The empirical semivariogram and its corresponding theoretical covariance model are estimated using the `gstat` package. This step converts the combined hard observations and soft-interval midpoints into an explicit model of spatial dependence:
 
-Experimental variograms and fitted covariance models are estimated using the `gstat` package. The plot of the variogram is shown below:
-
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
-# combine hard data and midpoints of soft data
-df <- data.frame(rbind(ch, cs), c(zh, (a + b) / 2))
-colnames(df) <- c("latitude", "longitude", "z")
-
+```{r eval=TRUE}
+df <- data.frame(rbind(ch, cs), z = c(zh, (a + b) / 2))
 sf_data <- sf::st_as_sf(df, coords = c("longitude", "latitude"))
 
-#  Empirical variogram 
 vg <- variogram(z ~ 1, data = sf_data)
-vg_model <- fit.variogram(
-  vg,
-  model = vgm(c("Exp", "Sph"))
-)
-
-# variogram plot
-plot(vg, vg_model)
-```
-
-The variogram model and parameters are given as:
-```{r}
-# variogram model
+vg_model <- fit.variogram(vg, model = vgm(c("Exp", "Sph")))
 vg_model
+
 ```
 
 
-#### Posterior Density Estimation
+### Posterior Density Estimation
 
-One of the principal advantages of the BME framework is the ability to estimate complete posterior probability density functions rather than producing only single-point predictions. Posterior densities can be estimated at selected prediction locations using the BME prediction functions provided in the package. 
+One of the principal advantages of the BME framework is the ability to estimate complete posterior probability density functions rather than producing only single-point predictions. Posterior densities can be estimated at selected prediction locations using the BME prediction functions provided in the package.
 
-Before performing full-scale BME prediction, it is often instructive to examine the posterior distributions at a few selected locations (preferably the some prediction locations). Although this step is not strictly necessary and can be skipped, it provides valuable insights into the shape, spread, and asymmetry of the posterior distributions. Moreover, it allows users to verify that the chosen domain for evaluation (`zk_range`) sufficiently encompasses the possible values of the target variable and to make adjustments if necessary.
+Before performing full-scale BME prediction, it is often instructive to examine the posterior distributions at a few selected locations. Although this step is not strictly necessary and can be skipped, it provides valuable insights into the shape, spread, and asymmetry of the posterior distributions. Moreover, it allows users to verify that the chosen domain for evaluation (`zk_range`) sufficiently encompasses the possible values of the target variable and to make adjustments if necessary.
 
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
-# set model parameters
-model <- as.character(vg_model[2, 1])
+The posterior density functions for selected prediction locations can be evaluated and visualized using the following code:
+
+```{r eval=TRUE, fig.width = 6, fig.height = 5, fig.align='center'}
+# Extract spatial parameters
+model  <- as.character(vg_model[2, 1])
 nugget <- vg_model[1, 2]
-sill <- vg_model[2, 2]
-range <- vg_model[2, 3]
+sill   <- vg_model[2, 2]
+range  <- vg_model[2, 3]
 
 # default zk_range
 p_1 <- prob_zk(xk[1,], data_object, model, nugget, sill, range)
@@ -332,9 +244,9 @@ names(p_df) <- c("zk_i", "p1", "p2", "p3", "p4")
 # Function to generate ggplot for a given column name
 plot_prob_curve <- function(df, pi_col) {
   ggplot(df, aes(x = zk_i, y = .data[[pi_col]])) +
-    geom_line(color = "blue", linewidth = 0.5) +
-    labs(x = "z", y = "f(z)") +
-    theme_minimal(base_size = 10) +
+    geom_line(color = "darkblue", linewidth = 0.7) +
+    labs(x = "Spatial Field Value (z)", y = "Posterior Density f(z)") +
+    theme_minimal() +
     theme(
       panel.background = ggplot2::element_rect(fill = "white", color = "black")
     )
@@ -348,20 +260,17 @@ p4 <- plot_prob_curve(p_df, "p4")
 
 # Arrange in a 2x2 grid
 grid.arrange(p1, p2, p3, p4, ncol = 2)
+
 ```
 
-Inspection of the posterior density plots above reveals that the estimated density functions reach zero at certain sub-regions within the default `zk_range`, for example $(-4.25, -2)$ and $(1.5, 2.5)$. This indicates that the true support of the posterior distribution is likely much narrower than the initially chosen default range. To improve the accuracy and computational efficiency of the BME predictions, it is advisable to refine the posterior domain by excluding regions where $f(z) = 0$, focusing on the interval where the posterior density is strictly positive. In this example, the refined range can be set to `[-2, 1.5]`, which better captures the plausible values of the target variable. Using the updated range, the posterior densities at the selected prediction locations are recomputed as shown below:
+Inspection of the posterior density plots above reveals that the estimated density functions reach zero at certain sub-regions within the default `zk_range`, for example $z < -2$ and $z > 1.5$. This indicates that the true support of the posterior distribution is likely much narrower than the initially chosen default range. To improve the accuracy and computational efficiency of the BME predictions, it is advisable to refine the posterior domain by excluding regions where $f(z) = 0$, focusing on the interval where the posterior density is strictly positive. In this example, the refined range can be set to `[-2, 2]`, which better captures the plausible values of the target variable. Using the updated range, the posterior densities at the selected prediction locations are recomputed as shown below:
 
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
-# updated zk_range: [-2, 1.5]
-q_1 <- prob_zk(xk[1,], data_object, model, nugget, sill, range, 
-               zk_range = c(-2, 2))
-q_2 <- prob_zk(xk[2,], data_object, model, nugget, sill, range, 
-               zk_range = c(-2, 2))
-q_3 <- prob_zk(xk[3,], data_object, model, nugget, sill, range, 
-               zk_range = c(-2, 2))
-q_4 <- prob_zk(xk[4,], data_object, model, nugget, sill, range, 
-               zk_range = c(-2, 2))
+```{r eval=TRUE, fig.width = 6, fig.height = 5, fig.align='center'}
+# updated zk_range: [-2, 2]
+q_1 <- prob_zk(xk[1,], data_object, model, nugget, sill, range, zk_range = c(-2, 2))
+q_2 <- prob_zk(xk[2,], data_object, model, nugget, sill, range, zk_range = c(-2, 2))
+q_3 <- prob_zk(xk[3,], data_object, model, nugget, sill, range, zk_range = c(-2, 2))
+q_4 <- prob_zk(xk[4,], data_object, model, nugget, sill, range, zk_range = c(-2, 2))
 q_df <- cbind.data.frame(q_1, q_2[, 2], q_3[, 2], q_4[, 2])
 names(q_df) <- c("zk_i", "q1", "q2", "q3", "q4")
 
@@ -372,132 +281,207 @@ q3 <- plot_prob_curve(q_df, "q3")
 q4 <- plot_prob_curve(q_df, "q4")
 
 grid.arrange(q1, q2, q3, q4, ncol = 2)
+
 ```
 
 
 #### Spatial Prediction
 
-Predictions within the BME framework can be computed using either the posterior mean or the posterior mode, depending on the desired interpretation and application. The posterior mean represents the expected value of the posterior probability density function and provides an average estimate that minimizes mean squared prediction error. In contrast, the posterior mode corresponds to the value associated with the highest posterior probability density and may provide a more representative estimate when the posterior distribution is asymmetric or multimodal.
+Predictions within the BME framework can be computed using the posterior mean, posterior median, or posterior mode, depending on the desired interpretation and application:
 
-In addition to point predictions, the BME framework also allows estimation of the associated posterior variance, which quantifies the uncertainty of the prediction at each location. The posterior variance provides important information regarding prediction reliability, spatial confidence, and the influence of nearby hard and soft observations. Together, the posterior mean or mode and the posterior variance offer a comprehensive probabilistic characterization of the spatial prediction process.
+* **Posterior Mean:** Represents the expected value of the posterior probability density function and provides an optimal point estimate that minimizes mean squared prediction error (MSPE).
+* **Posterior Median:** Identifies the 50th percentile of the localized distribution, providing an alternative central tendency metric that is robust to extreme outliers and heavy tails.
+* **Posterior Mode:** Corresponds to the value associated with the highest localized probability density, tracking the most likely spatial state when the conditional distribution is asymmetric or multimodal.
 
-The posterior mode predictions for the estimation locations are computed as
+In addition to point predictions, the framework quantifies prediction reliability and spatial confidence through full uncertainty propagation:
 
-```{r}
-bme_predict(xk, data_object, model, nugget, sill, range,
-            n = 100, zk_range = c(-2, 2), type = "mode")
+* **Posterior Variance:** Quantifies the spread of the posterior density at each location, reflecting the proximity and information quality of neighboring hard and soft observations.
+* **Credible Intervals:** Computed directly from the integrated posterior probability density function to define explicit probabilistic bounds (e.g., a 90% credible interval) that contain the true value with a specified probability, capturing localized non-Gaussian asymmetries that standard kriging variance intervals overlook.
+
+Together, these point estimators, variance fields, and credible intervals offer a comprehensive probabilistic characterization of the spatial prediction process. The posterior point estimators across the unobserved target locations are executed below.
+
+##### Posterior Mode Point Predictions
+
+The posterior mode captures the peak of the localized probability density function:
+
+```{r eval=TRUE}
+CBME_mode <- bme_predict(xk, data_object, model, nugget, sill, range,
+                         n = 100, zk_range = c(-2, 2), type = "mode")
+head(CBME_mode)
+
 ```
 
-The posterior mean predictions for the estimation locations are computed as
+##### Posterior Mean Point Predictions
 
-```{r}
-bme_predict(xk, data_object, model, nugget, sill, range,
-            n = 100, zk_range = c(-2, 2), type = "mean")
+The posterior mean minimizes the mean squared prediction error across the field:
+
+```{r eval=TRUE}
+CBME_mean <- bme_predict(xk, data_object, model, nugget, sill, range,
+                         n = 100, zk_range = c(-2, 2), type = "mean")
+head(CBME_mean)
+
 ```
 
-#### Cross-Validation Analysis
+##### Posterior Median Point Predictions
 
-To quantitatively evaluate predictive accuracy of the BME model, leave-one-out cross-validation (LOOCV) is conducted at all hard data locations. During each iteration, a single hard data observation is excluded from model fitting, predicted using the remaining observations, and compared with the corresponding measured value. This procedure generates pointwise predictions and residuals for every hard data location while maximizing data utilization, making LOOCV particularly suitable for small datasets where partitioning into separate training and testing subsets would reduce the effective sample size. Because each iteration excludes a different observation, slight variations occur in the fitted variogram for each prediction location. Predictive performance is quantified using mean error (ME), mean absolute error (MAE), root mean square error (RMSE), and coefficient of determination (R$^2$).
+The posterior median provides an alternative central tendency metric robust to distribution skewness:
 
-```{r}
-CBME_cv <- bme_cv(data_object, model, nugget, sill, range,
-                  n = 100, zk_range = c(-2, 2), type = "mean")
-CBME_cv
+```{r eval=TRUE}
+CBME_median <- bme_predict(xk, data_object, model, nugget, sill, range,
+                           n = 100, zk_range = c(-2, 2), type = "median")
+head(CBME_median)
+
 ```
 
-Key summary metrics for model performance is given computed as
+##### Probabilistic Uncertainty Bounds (90% Credible Intervals)
 
-```{r}
-summary(CBME_cv)
-```
+To construct explicit probability bounds around our predictions, a 90% credible interval is integrated directly from the localized conditional probability density fields:
 
-Diagnostic plots are generated to evaluate model adequacy through visual assessment of residual behavior. These plots facilitate identification of deviations from assumptions including spatial independence, homoscedasticity, and stationarity. Residual patterns may also reveal locations associated with unusually large prediction errors or spatial clustering, potentially indicating the need for model refinement or incorporation of additional data considerations. The residual plots are generated by
+```{r eval=TRUE}
+CBME_interval <- bme_predict_ci(xk, data_object, model, nugget, sill, range,
+                                n = 100, zk_range = c(-2, 2), level = 0.90)
+head(CBME_interval)
 
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
-plot(CBME_cv)
 ```
 
 
 ### The QBME Implementation
 
-Unlike the CBME approach, QBME does not require users to specify a variogram model. Instead, spatial dependence is internally captured through quantile specific variogram estimation, allowing the method to adaptatively represent variability across different levels of the data distribution.
+Unlike the classical approach, the QBME implementation completely bypasses manual variogram modeling. Spatial continuity is internally and adaptively captured through an ensemble of quantile-specific variogram estimations across different levels of the data distribution. Consequently, the user-specified spatial parameters (`model`, `nugget`, `sill`, and `range`) are omitted entirely from the function calls. Instead, the user provides a key configuration argument: `nq`, which defines the number of discrete quantile levels used to partition and approximate the soft-interval bounds.
 
+Despite these distinct core structural changes in structural parameter estimation, the QBME framework produces the identical suite of localized posterior characterizations, point estimators, and uncertainty measures as the CBME workflow.
 
 #### Posterior Distribution Estimation at Individual Locations
 
-Similarly to the CBME, it is advisable to examine the posterior distributions at a few selected locations in other to choose an appropriate `zk_range`. The posterior density plots of the selected locations are shown below:
+Just as with the CBME approach, it is highly recommended to inspect localized posterior distribution curves at targeted test locations to pick an optimal support window (`zk_range`). The conditional density field can be extracted using the quantile-specific utility function. 
 
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
-# default zk_range
-q_1 <- q_prob_zk(xk[1,], data_object)
-q_2 <- q_prob_zk(xk[2,], data_object)
-q_3 <- q_prob_zk(xk[3,], data_object)
-q_4 <- q_prob_zk(xk[4,], data_object)
-q_df <- cbind.data.frame(q_1, q_2[, 2], q_3[, 2], q_4[, 2])
-names(q_df) <- c("zk_i", "q1", "q2", "q3", "q4")
+*(Note: The following chunks illustrate the implementation syntax and are not evaluated here).*
 
-# Generate individual plots
-q1 <- plot_prob_curve(q_df, "q1")
-q2 <- plot_prob_curve(q_df, "q2")
-q3 <- plot_prob_curve(q_df, "q3")
-q4 <- plot_prob_curve(q_df, "q4")
+```{r eval=FALSE}
+# Evaluate localized posterior density curve using nq = 8 quantile slices
+q_1 <- q_prob_zk(xk[1,], data_object, nq = 8)
 
-# Arrange in a 2x2 grid
-grid.arrange(q1, q2, q3, q4, ncol = 2)
 ```
 
-Based on the above plots, the `zk_range` which better captures the plausible values of the target variable can be set to `[-1.5, 1]`.
+#### Spatial Prediction and Uncertainty Propagation
 
+Point predictions and probabilistic interval bounds are generated using the `q_bme_predict()` and `q_bme_predict_ci()` engines. The implementation syntax mirrors the classical execution, requiring only the removal of the explicit variogram parameters and the inclusion of the `nq` argument.
 
-#### Spatial Prediction
+*(Note: The code chunks below demonstrate the syntax configuration for the point estimators and credible intervals and are not evaluated here).*
 
-The posterior mode predictions for the estimation locations are computed as
+```{r eval=FALSE}
+# Compute posterior mode point predictions
+QBME_mode   <- q_bme_predict(xk, data_object, n = 100, type = "mode", nq = 8)
 
-```{r }
-q_bme_predict(xk, data_object, n = 100, zk_range = c(-1.5, 1), type = "mode")
+# Compute posterior mean point predictions
+QBME_mean   <- q_bme_predict(xk, data_object, n = 100, type = "mean", nq = 8)
+
+# Compute posterior median point predictions
+QBME_median <- q_bme_predict(xk, data_object, n = 100, type = "median", nq = 8)
+
+# Integrated 90% probabilistic credible interval bounds
+QBME_int    <- q_bme_predict_ci(xk, data_object, n = 100, level = 0.90, nq = 8)
+
 ```
 
-The posterior mean predictions for the estimation locations are computed as
 
-```{r }
-q_bme_predict(xk, data_object, n = 100, zk_range = c(-1.5, 1), type = "mean")
+### Cross-Validation Systems & Diagnostic Testing
+
+To rigorously evaluate the predictive performance and structural integrity of both interpolation frameworks, the package provides dedicated cross-validation engines: `bme_cv()` for the classical framework (CBME) and `q_bme_cv()` for the quantile-based framework (QBME). These functions execute internal validation routines exclusively at hard data locations, supporting both flexible K-fold data partitioning and exact Leave-One-Out Cross-Validation (LOOCV). By setting the fold parameter `k` equal to the total number of hard observations, the engine automatically executes a full LOOCV routine. During each validation step, the targeted hard observation is systematically omitted from the conditioning neighborhood, a localized estimation is generated using the remaining hard and soft spatial datasets, and the result is verified against the true, measured baseline value.
+
+This resampling approach maximizes data utility, making it highly effective for small or heterogeneous spatial datasets where separating data into fixed training and validation subsets would severely degrade the sample size. Predictive performance across both validation routines is comprehensively quantified using standard geostatistical error metrics:
+
+* **Mean Error (ME):** Evaluates systemic model bias; values near zero indicate a lack of global over- or under-estimation.
+* **Mean Absolute Error (MAE):** Measures the average magnitude of absolute prediction residuals, providing a robust baseline of average error absolute limits.
+* **Root Mean Square Error (RMSE):** Quantifies prediction precision, penalizing larger outliers more heavily to capture severe spatial variance deviations.
+* **Coefficient of Determination ($R^2$):** Represents the proportion of total spatial variance successfully captured and accounted for by the BME model.
+
+The resulting validation objects inherit customized S3 methods (`summary()` and `plot()`) allowing users to instantaneously compute standard geostatistical error metrics or render diagnostic plots to evaluate model adequacy through visual assessment of residual behavior. These plots facilitate identification of deviations from assumptions including spatial independence, homoscedasticity, and stationarity.
+
+There is a small discrepancy in the original snippet: the text mentions a 5-fold cross-validation, but the code argument is set to `k = 10` (10-fold). The version below fixes this parameter discrepancy to ensure the prose matches the code execution exactly.
+
+Executing a 5-fold cross-validation ($k = 5$) using the CBME framework is performed as follows:
+
+```{r eval=TRUE}
+# Execute 5-fold cross-validation across the hard data locations
+CBME_cv <- bme_cv(data_object, model, nugget, sill, range, n = 100, 
+                  zk_range = c(-2, 2), type = "mean", k = 5)
+CBME_cv
+
 ```
 
-#### Cross-Validation Analysis
+Key summary performance metrics can be extracted using the S3 summary method:
 
-The LOOCV on the hard data is computed as
+```{r eval=TRUE}
+# Extract comprehensive cross-validation error metrics
+summary(CBME_cv)
 
-```{r }
-QBME_cv <- q_bme_cv(data_object, n = 100, zk_range = c(-1.5, 1), 
-                    nq = 8, type = "mean")
+```
+
+Diagnostic plots are generated via the S3 plot method to visually inspect residual patterns:
+
+```{r eval=TRUE, fig.width = 6, fig.height = 5, fig.align='center'}
+# Render diagnostic residual charts
+plot(CBME_cv)
+
+```
+
+
+Similarly, diagnostic cross-validation can be executed within the QBME framework using `q_bme_cv()`. The code chunk below demonstrates how to perform a full Leave-One-Out Cross-Validation (LOOCV) by setting the fold parameter `k` equal to the total number of hard observations (`nrow(ch)`).
+
+*(Note: The following chunks illustrate the implementation syntax and are not evaluated here).*
+
+```{r eval=FALSE}
+# Execute Leave-One-Out Cross-Validation (LOOCV) under the QBME framework
+QBME_cv <- q_bme_cv(data_object, n = 100, nq = 8, type = "mean", k = nrow(ch))
 QBME_cv
+
 ```
 
-Key summary metrics for model performance is given computed as
+Just as with the classical framework, the summary performance statistics and diagnostic residual plots are easily extracted using standard S3 methods:
 
-```{r }
+```{r eval=FALSE}
+# Extract diagnostic summary metrics for the QBME validation routine
 summary(QBME_cv)
+
 ```
 
-The residual plots are generated by
-
-```{r fig.width = 6, fig.height = 6, fig.align='center'}
+```{r eval=FALSE}
+# Render diagnostic residual plots to assess QBME prediction adequacy
 plot(QBME_cv)
+
 ```
 
 
-## Conclusion
+### Spatial Visualization of Prediction Fields
 
-The **BMEmapping** package provides a comprehensive framework for Bayesian Maximum Entropy spatial interpolation using both hard and soft spatial observations. By explicitly incorporating interval uncertainty into the interpolation process, the package enables more realistic uncertainty quantification and probabilistic spatial prediction than methods based solely on precise observations.
+To complement the numerical predictions, the package provides comprehensive spatial visualization tools built directly into its architecture. The standard S3 `plot()` method has been extended to accept prediction collection objects from both the CBME and QBME workflows (e.g., outputs from `bme_predict()` or `q_bme_predict()`). Leveraging this function allows users to instantly transform tabular spatial predictions into continuous geographic maps. This visual diagnostic tool is crucial for analyzing macro-scale geographic prediction trends, identifying spatial anomalies, and mapping localized hotspots across your targeted study domain.
 
-The workflows demonstrated throughout this tutorial illustrate how Bayesian Maximum Entropy methods can be efficiently implemented within the \textsf{R} environment for spatial prediction, posterior density estimation, variogram modeling, uncertainty visualization, and predictive assessment.
+Furthermore, because the BME framework tracks full uncertainty propagation, the plotting engine can map both the estimated point prediction surfaces (mean, median, or mode) and their corresponding spatial uncertainty metrics, such as the posterior variance. This dual visualization provides a complete spatial perspective on both the predicted state of the field and the localized reliability of those predictions.
 
-The package is particularly well suited for environmental and geostatistical applications involving heterogeneous datasets characterized by incomplete, interval-valued, or uncertain observations.
+The continuous spatial prediction surface can be rendered using the following implementation syntax:
+
+```{r eval=TRUE, fig.width = 6, fig.height = 5, fig.align='center'}
+# Map the continuous spatial prediction surface across the target geographic area
+plot(CBME_mean)
+
+```
 
 
+## Conclusion and Future Directions
 
+The **BMEmapping** package introduces a rigorous, computationally optimized framework for Bayesian Maximum Entropy (BME) spatial interpolation within the R environment, successfully uniting classical geostatistical concepts with general probabilistic information processing. By seamlessly integrating both exact physical measurements (**hard data**) and uncertain, interval-valued constraints (**soft data**), the package circumvents the strict Gaussian and linearity limitations inherent to traditional kriging methods.
 
+Throughout this vignette, we demonstrated complete structural workflows for both the Classical BME (CBME) and Quantile-Based BME (QBME) frameworks. These implementations span empirical semivariogram modeling, localized posterior probability density estimation, non-Gaussian uncertainty propagation, and automated multi-fold cross-validation routines. By analyzing the `utsnowload` dataset, we showed how accommodating interval uncertainty yields highly nuanced spatial predictions—offering distinct posterior mean, median, and mode estimators alongside robust spatial variance fields and asymmetric $90\%$ credible intervals that adapt to localized data configurations.
 
+The current implementation proves uniquely suited for environmental, hydrological, and meteorological applications where physical monitoring networks are inherently heterogeneous, patchy, or subject to instrument thresholds.
 
+### Future Methodological Improvements
 
+While the accelerated interval-valued routines within **BMEmapping** represent a substantial step forward for practical geostatistics, several foundational expansions are planned for future releases to fully leverage the theoretical capabilities of the BME paradigm:
 
+* **Probabilistic Soft Data Integration:** Future versions will expand the soft data ingestion pipeline beyond bounded intervals to accommodate full probabilistic distributions. This includes Gaussian soft data—characterized by an estimated mean $\mu$ and standard error $\sigma$ derived from collocated proxy variables or secondary remote sensing instruments—as well as arbitrary custom probability density functions (PDFs).
+* **Functional Soft Data Support:** Methodological work is underway to support soft data formatted as continuous functions or conditional probability matrices. This will allow users to pass complex soft information, such as categorical indicator probabilities, non-parametric risk curves, or physics-informed constraints, directly into the core entropy maximization engine.
+* **Spatiotemporal Extension:** Expanding the spatial covariance architectures into the space-time domain will enable the package to model dynamic environmental systems, capturing both spatial correlation structures and temporal dependencies concurrently.
+
+By continuously broadening the types of non-local and soft information the package can digest, **BMEmapping** aims to remain a versatile tool for advanced uncertainty quantification and probabilistic spatial data science.

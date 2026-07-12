@@ -26,21 +26,21 @@ variogram model.}
 \item{range}{A positive numeric value for the range (or effective range)
 parameter of the variogram model.}
 
-\item{nsmax}{An integer specifying the maximum number of nearby soft data
-points to include for estimation (default is 5).}
+\item{nsmax}{A positive numeric value specifying the maximum number of nearby
+soft data points to include for estimation (default is 5).}
 
-\item{nhmax}{An integer specifying the maximum number of nearby hard data
-points to include for estimation (default is 5).}
+\item{nhmax}{A positive numeric value specifying the maximum number of nearby
+hard data points to include for estimation (default is 5).}
 
-\item{n}{An integer indicating the number of points at which to evaluate the
-posterior density over \code{zk_range} (default is 50).}
+\item{n}{A positive numeric value indicating the number of points at which to
+evaluate the posterior density over \code{zk_range} (default is 50).}
 
 \item{zk_range}{A numeric vector specifying the range over which to evaluate
 the unobserved value at the estimation location (\code{zk}). Although
 \code{zk} is unknown,  it is assumed to lie within a range similar to
 the observed data (\code{zh}, \code{a}, and \code{b}). It is advisable
 to explore the posterior distribution at a few locations using
-\code{prob_zk()} before finalizing this range}
+\code{prob_zk()} before finalizing this range.}
 }
 \value{
 A data frame with two columns: \code{zk_i} (assumed zk values) and

@@ -6,7 +6,8 @@
 the random quantile approach.}
 \usage{
 q_bme_cv(data_object, nsmax = 5, nhmax = 5, n = 50, nq = 3,
-              zk_range = extended_range(data_object), type)
+              zk_range = extended_range(data_object), type,
+              k = 5)
 }
 \arguments{
 \item{data_object}{A list containing the hard and soft data.}
@@ -33,21 +34,31 @@ to explore the posterior distribution at a few locations using
 \item{type}{A string indicating the type of BME prediction to compute: either
 \code{"mean"} for the posterior mean or \code{"mode"} for the
 posterior mode.}
+
+\item{k}{A positive numeric value specifying the number of folds
+(or partitions) into which the hard data are divided (default is 5).}
 }
 \value{
-A data frame containing the coordinates, observed
-values, BME predictions (posterior \code{mean} or \code{mode}),
-posterior variance (if \code{type = "mean"}), residuals, and fold
-indices.
+A data frame containing the coordinates of the hard data locations,
+the observed values, the corresponding BME predictions (posterior
+\code{mean}, \code{mode}, or \code{median}, depending on
+\code{type}), the posterior variance (when
+\code{type = "mean"}), the prediction residuals, and the
+cross-validation fold indices.
 }
 \description{
-\code{q_bme_cv} performs LOOCV to evaluate the prediction performance
-of the Bayesian Maximum Entropy (BME) spatial interpolation using the random
-quantile approach. For each hard data location, the function
-removes the observed value and predicts it using all remaining hard and soft
-data points. This is repeated for every hard data location. The predictions
-are either posterior means or posterior modes, depending on the \code{type}
-argument.
+\code{bme_cv} performs cross-validation to evaluate the predictive
+performance of the Bayesian Maximum Entropy (BME) spatial interpolation
+method using both hard and soft (interval) data. The function supports both
+leave-one-out cross-validation (LOOCV) and K-fold cross-validation,
+depending on the value of \code{k}. If \code{k} equals the number of hard
+data locations, LOOCV is performed by removing one hard observation at a
+time and predicting it using the remaining hard and all soft data. If
+\code{k} is less than the number of hard data locations, the hard data are
+randomly partitioned into \code{k} folds, with each fold used once as the
+validation set while the remaining folds are used for prediction. Depending
+on the \code{type} argument, predictions are returned as posterior means,
+posterior modes, or posterior medians.
 
 This function is useful for validating the BME interpolation method and
 tuning variogram parameters.
@@ -60,6 +71,6 @@ zh <- utsnowload[2:10, c("hard")]
 a <- utsnowload[68:232, c("lower")]
 b <- utsnowload[68:232, c("upper")]
 data_object <- bme_map(ch, cs, zh, a, b)
-q_bme_cv(data_object, nq = 3, type = "mean")
+q_bme_cv(data_object, type = "mean", k = 5)
 
 }

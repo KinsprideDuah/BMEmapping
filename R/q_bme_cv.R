@@ -2,7 +2,8 @@
 #'        the random quantile approach.
 #'
 #' @usage q_bme_cv(data_object, nsmax = 5, nhmax = 5, n = 50, nq = 3,
-#'               zk_range = extended_range(data_object), type)
+#'               zk_range = extended_range(data_object), type,
+#'               k = 5)
 #'
 #' @param data_object A list containing the hard and soft data.
 #' @param nsmax An integer specifying the maximum number of nearby soft data
@@ -22,20 +23,29 @@
 #' @param type A string indicating the type of BME prediction to compute: either
 #'        \code{"mean"} for the posterior mean or \code{"mode"} for the
 #'        posterior mode.
+#' @param k A positive numeric value specifying the number of folds
+#'        (or partitions) into which the hard data are divided (default is 5).
 #'
-#' @returns A data frame containing the coordinates, observed
-#'          values, BME predictions (posterior \code{mean} or \code{mode}),
-#'          posterior variance (if \code{type = "mean"}), residuals, and fold
-#'          indices.
+#' @returns A data frame containing the coordinates of the hard data locations,
+#'          the observed values, the corresponding BME predictions (posterior
+#'          \code{mean}, \code{mode}, or \code{median}, depending on
+#'          \code{type}), the posterior variance (when
+#'          \code{type = "mean"}), the prediction residuals, and the
+#'          cross-validation fold indices.
 #'
 #' @description
-#' \code{q_bme_cv} performs LOOCV to evaluate the prediction performance
-#' of the Bayesian Maximum Entropy (BME) spatial interpolation using the random
-#' quantile approach. For each hard data location, the function
-#' removes the observed value and predicts it using all remaining hard and soft
-#' data points. This is repeated for every hard data location. The predictions
-#' are either posterior means or posterior modes, depending on the \code{type}
-#' argument.
+#' \code{bme_cv} performs cross-validation to evaluate the predictive
+#' performance of the Bayesian Maximum Entropy (BME) spatial interpolation
+#' method using both hard and soft (interval) data. The function supports both
+#' leave-one-out cross-validation (LOOCV) and K-fold cross-validation,
+#' depending on the value of \code{k}. If \code{k} equals the number of hard
+#' data locations, LOOCV is performed by removing one hard observation at a
+#' time and predicting it using the remaining hard and all soft data. If
+#' \code{k} is less than the number of hard data locations, the hard data are
+#' randomly partitioned into \code{k} folds, with each fold used once as the
+#' validation set while the remaining folds are used for prediction. Depending
+#' on the \code{type} argument, predictions are returned as posterior means,
+#' posterior modes, or posterior medians.
 #'
 #' This function is useful for validating the BME interpolation method and
 #' tuning variogram parameters.
@@ -48,44 +58,46 @@
 #' a <- utsnowload[68:232, c("lower")]
 #' b <- utsnowload[68:232, c("upper")]
 #' data_object <- bme_map(ch, cs, zh, a, b)
-#' q_bme_cv(data_object, nq = 3, type = "mean")
+#' q_bme_cv(data_object, type = "mean", k = 5)
 #'
 #' @export
-q_bme_cv <- function(data_object,  nsmax = 5, nhmax = 5, n = 50, nq = 3,
-                     zk_range = extended_range(data_object),
-                   type) {
-  type <- match.arg(type, choices = c("mean", "mode"))
-  col_idx <- if (type == "mode") 1 else c(2, 3)
-  col_names <- if (type == "mode") "mode" else c("mean", "variance")
+q_bme_cv <- function(data_object, nsmax = 5, nhmax = 5, n = 50, nq =3,
+                   zk_range = extended_range(data_object),
+                   type, k = 5) {
 
-  ch <- as.data.frame(data_object$ch)
-  cs <- as.data.frame(data_object$cs)
-  zh <- data_object$zh
-  a <- data_object$a
-  b <- data_object$b
+  # Number of hard data locations
+  nk <- nrow(as.data.frame(data_object$ch))
 
-  nh <- nrow(ch)
-  est <- matrix(NA, nrow = nh, ncol = length(col_idx))
+  # Use LOOCV when k equals the number of hard data points
+  if (k == nk) {
 
-  for (i in seq_len(nh)) {
-    data_obj <- bme_map(
-      ch = ch[-i, ],
-      cs = cs,
-      zh = zh[-i],
-      a = a,
-      b = b
+    result <- q_bme_loocv(
+      data_object = data_object,
+      nq = nq,
+      nsmax = nsmax,
+      nhmax = nhmax,
+      n = n,
+      zk_range = zk_range,
+      type = type
     )
 
-    est[i, ] <- q_bme_estimate(
-      x = ch[i, ], data_object = data_obj,
-      nsmax = nsmax, nhmax = nhmax, n = n, nq = nq,
-      zk_range = zk_range
-    )[, col_idx]
+  } else if (k < nk) {
+
+    result <- q_bme_kfcv(
+      data_object = data_object,
+      nq = nq,
+      nsmax = nsmax,
+      nhmax = nhmax,
+      n = n,
+      zk_range = zk_range,
+      type = type,
+      k = k
+    )
+
+  } else {
+
+    stop("k cannot be greater than the number of hard data locations.")
   }
 
-  ch_names <- if (is.null(colnames(ch))) c("coord.1", "coord.2") else colnames(ch)
-  result <- cbind.data.frame(ch, zh, est, round(zh - est[, 1], 4), seq_len(nh))
-  names(result) <- c(ch_names, "observed", col_names, "residual", "fold")
-
-  return(structure(result, class = c("BMEmapping", "data.frame")))
+  return(result)
 }
